@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(extract-text \"KitchenCarShiftOptimizer 仕様書 最終版.docx\")",
+      "Bash(pandoc \"KitchenCarShiftOptimizer 仕様書 最終版.docx\" -t markdown)",
+      "Bash(python3 -c ' *)",
+      "Bash(npm create *)",
+      "Bash(npm install *)",
+      "Bash(sudo chmod *)",
+      "Bash(npm --version)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(git rm *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git remote *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(gh run *)",
+      "Bash(git fetch *)",
+      "Bash(git stash *)",
+      "Bash(git checkout *)",
+      "Bash(npx tsc *)",
+      "Bash(xargs cat *)"
+    ]
+  }
+}

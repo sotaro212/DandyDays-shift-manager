@@ -221,23 +221,23 @@ export function ShiftManagement() {
 
       {/* 共有URL */}
       {shareUrl && (
-        <div className="bg-dandy-50 border border-dandy-200 rounded-xl p-3 space-y-2">
-          <p className="text-xs font-medium text-dandy-600">バイト向け回答URL</p>
+        <div className="bg-dandy-500 rounded-xl p-4 space-y-3">
+          <p className="text-sm font-bold text-white">📎 バイト向け回答URL</p>
           {!gasUrl && (
-            <div className="bg-amber-50 border border-amber-200 rounded p-2 text-xs text-amber-800">
+            <div className="bg-white/20 rounded-lg p-2 text-xs text-white">
               ⚠️ GAS URLが未設定です。下のボタンからGAS URLを設定するとバイトが回答できます。
             </div>
           )}
           <div className="flex gap-2">
             <input readOnly value={shareUrl}
-              className="flex-1 text-xs border border-dandy-200 rounded px-2 py-1 bg-white" />
+              className="flex-1 text-xs border-0 rounded-lg px-3 py-2 bg-white text-gray-700 font-mono" />
             <button onClick={() => navigator.clipboard.writeText(shareUrl)}
-              className="text-xs bg-dandy-500 text-white px-3 py-1 rounded hover:bg-dandy-600">
+              className="text-sm font-bold bg-white text-dandy-600 px-4 py-2 rounded-lg hover:bg-dandy-50 transition-colors shrink-0">
               コピー
             </button>
           </div>
           <button onClick={() => setShowGasInput(v => !v)}
-            className="text-xs text-dandy-500 underline">
+            className="text-xs text-white/80 underline hover:text-white">
             {gasUrl ? '✓ GAS URL設定済み（変更する）' : 'GAS URLを設定する'}
           </button>
           {showGasInput && (

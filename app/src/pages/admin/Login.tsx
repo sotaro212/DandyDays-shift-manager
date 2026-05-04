@@ -50,10 +50,10 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-dandy-50 to-dandy-100 p-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-8">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 bg-dandy-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span className="text-white text-2xl">📅</span>
           </div>
           <h1 className="text-xl font-bold text-gray-800">シフト管理</h1>
@@ -90,7 +90,7 @@ export function Login() {
               <p className="text-red-500 text-xs text-center mt-3 whitespace-pre-line">{error}</p>
             )}
 
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
+            <div className="mt-4 p-3 bg-dandy-50 rounded-lg text-xs text-dandy-700">
               ※ログイン後に「このアプリは確認されていません」の画面が出た場合は<br />
               「詳細」→「dandy shiftに移動（安全でないページ）」をクリックしてください
             </div>

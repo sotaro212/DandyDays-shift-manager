@@ -79,7 +79,7 @@ export function StaffManagement() {
         <h1 className="text-xl font-bold text-gray-800">スタッフ管理</h1>
         <button
           onClick={() => setShowAdd(true)}
-          className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1.5 rounded-lg"
+          className="flex items-center gap-1 bg-dandy-500 hover:bg-dandy-600 text-white text-sm px-3 py-1.5 rounded-lg"
         >
           <UserPlus size={14} /> スタッフ追加
         </button>
@@ -92,7 +92,7 @@ export function StaffManagement() {
             key={f}
             onClick={() => setFilter(f)}
             className={`px-3 py-1 text-sm rounded-full border transition-colors
-              ${filter === f ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              ${filter === f ? 'bg-dandy-500 text-white border-dandy-500' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
           >
             {f === 'all' ? `全員 (${data.members.length})` : f === 'admin' ? `管理者 (${data.members.filter(m=>m.role==='admin').length})` : `バイト (${data.members.filter(m=>m.role==='user').length})`}
           </button>
@@ -108,7 +108,7 @@ export function StaffManagement() {
         <div className="bg-white rounded-xl border divide-y overflow-hidden">
           {filtered.map(member => (
             <div key={member.id} className="flex items-center gap-3 px-4 py-3">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm shrink-0">
+              <div className="w-8 h-8 rounded-full bg-dandy-100 flex items-center justify-center text-dandy-600 font-bold text-sm shrink-0">
                 {member.name.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
@@ -127,7 +127,7 @@ export function StaffManagement() {
                 <button
                   onClick={() => handleOpenEdit(member)}
                   title="名前・住所を編集"
-                  className="text-gray-400 hover:text-blue-500 p-1"
+                  className="text-gray-400 hover:text-dandy-400 p-1"
                 >
                   <Pencil size={15} />
                 </button>
@@ -135,7 +135,7 @@ export function StaffManagement() {
                   <button
                     onClick={() => handleRoleToggle(member.id, member.role)}
                     title={member.role === 'admin' ? '管理者を降格' : '管理者に昇格'}
-                    className="text-gray-400 hover:text-blue-500 p-1"
+                    className="text-gray-400 hover:text-dandy-400 p-1"
                   >
                     {member.role === 'admin' ? <ShieldOff size={16} /> : <ShieldCheck size={16} />}
                   </button>
@@ -177,7 +177,7 @@ export function StaffManagement() {
             </div>
             {error && <p className="text-red-500 text-xs">{error}</p>}
             <button onClick={handleAdd}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm hover:bg-blue-700">
+              className="w-full bg-dandy-500 text-white py-2 rounded-lg text-sm hover:bg-dandy-600">
               追加する
             </button>
           </div>
@@ -212,7 +212,7 @@ export function StaffManagement() {
                 キャンセル
               </button>
               <button onClick={handleSaveEdit}
-                className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm hover:bg-blue-700">
+                className="flex-1 bg-dandy-500 text-white py-2 rounded-lg text-sm hover:bg-dandy-600">
                 保存する
               </button>
             </div>

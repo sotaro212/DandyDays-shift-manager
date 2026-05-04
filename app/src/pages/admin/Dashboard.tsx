@@ -57,7 +57,7 @@ export function Dashboard() {
         <h1 className="text-xl font-bold text-gray-800">ダッシュボード</h1>
         <button
           onClick={() => setShowSheetChange(v => !v)}
-          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-blue-600 border rounded-lg px-2.5 py-1.5 hover:bg-blue-50 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-dandy-500 border rounded-lg px-2.5 py-1.5 hover:bg-dandy-50 transition-colors"
         >
           <Database size={13} />
           スプレッドシート変更
@@ -94,7 +94,7 @@ export function Dashboard() {
             <button
               onClick={handleChangeSheet}
               disabled={isLoadingSheets}
-              className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+              className="flex-1 bg-dandy-500 text-white py-2 rounded-lg text-sm hover:bg-dandy-600 disabled:opacity-50"
             >
               {isLoadingSheets ? '接続中...' : '接続する'}
             </button>
@@ -112,8 +112,8 @@ export function Dashboard() {
 
       {/* サマリーカード */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard icon={<Users size={20} className="text-blue-500" />} label="バイト" value={`${totalStaff}名`} />
-        <StatCard icon={<Users size={20} className="text-indigo-500" />} label="管理者" value={`${totalAdmins}名`} />
+        <StatCard icon={<Users size={20} className="text-dandy-400" />} label="バイト" value={`${totalStaff}名`} />
+        <StatCard icon={<Users size={20} className="text-dandy-400" />} label="管理者" value={`${totalAdmins}名`} />
         <StatCard icon={<CheckCircle2 size={20} className="text-green-500" />} label="今月確定枠" value={`${confirmedCount}枠`} />
         <StatCard icon={<AlertCircle size={20} className="text-red-500" />} label="今月未確定" value={`${undecidedCount}枠`} color={undecidedCount > 0 ? 'red' : undefined} />
       </div>
@@ -124,7 +124,7 @@ export function Dashboard() {
           <h2 className="font-semibold text-gray-700">月別シフト</h2>
           <button
             onClick={() => navigate('/admin/shifts')}
-            className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+            className="text-sm text-dandy-500 hover:underline flex items-center gap-1"
           >
             <CalendarDays size={14} />
             シフト管理へ
@@ -146,7 +146,7 @@ export function Dashboard() {
                 <div
                   key={month.id}
                   onClick={() => navigate('/admin/shifts', { state: { monthId: month.id } })}
-                  className="bg-white rounded-xl border p-4 flex items-center justify-between cursor-pointer hover:bg-blue-50 transition-colors"
+                  className="bg-white rounded-xl border p-4 flex items-center justify-between cursor-pointer hover:bg-dandy-50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <Clock size={18} className="text-gray-400" />

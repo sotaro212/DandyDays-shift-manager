@@ -189,7 +189,7 @@ export function ShiftManagement() {
           {(!currentMonth || currentMonth.status === 'draft') && (
             <>
               <button onClick={() => setShowAddSlot(true)}
-                className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1.5 rounded-lg">
+                className="flex items-center gap-1 bg-dandy-500 hover:bg-dandy-600 text-white text-sm px-3 py-1.5 rounded-lg">
                 <Plus size={14} /> 枠を追加
               </button>
               <button onClick={() => setShowCopy(true)}
@@ -207,7 +207,7 @@ export function ShiftManagement() {
           {currentMonth?.status === 'published' && (
             <>
               <button onClick={() => setShowAddSlot(true)}
-                className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1.5 rounded-lg">
+                className="flex items-center gap-1 bg-dandy-500 hover:bg-dandy-600 text-white text-sm px-3 py-1.5 rounded-lg">
                 <Plus size={14} /> 枠を追加
               </button>
               <button onClick={handleClose}
@@ -221,8 +221,8 @@ export function ShiftManagement() {
 
       {/* 共有URL */}
       {shareUrl && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 space-y-2">
-          <p className="text-xs font-medium text-blue-700">バイト向け回答URL</p>
+        <div className="bg-dandy-50 border border-dandy-200 rounded-xl p-3 space-y-2">
+          <p className="text-xs font-medium text-dandy-600">バイト向け回答URL</p>
           {!gasUrl && (
             <div className="bg-amber-50 border border-amber-200 rounded p-2 text-xs text-amber-800">
               ⚠️ GAS URLが未設定です。下のボタンからGAS URLを設定するとバイトが回答できます。
@@ -230,14 +230,14 @@ export function ShiftManagement() {
           )}
           <div className="flex gap-2">
             <input readOnly value={shareUrl}
-              className="flex-1 text-xs border border-blue-200 rounded px-2 py-1 bg-white" />
+              className="flex-1 text-xs border border-dandy-200 rounded px-2 py-1 bg-white" />
             <button onClick={() => navigator.clipboard.writeText(shareUrl)}
-              className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+              className="text-xs bg-dandy-500 text-white px-3 py-1 rounded hover:bg-dandy-600">
               コピー
             </button>
           </div>
           <button onClick={() => setShowGasInput(v => !v)}
-            className="text-xs text-blue-600 underline">
+            className="text-xs text-dandy-500 underline">
             {gasUrl ? '✓ GAS URL設定済み（変更する）' : 'GAS URLを設定する'}
           </button>
           {showGasInput && (
@@ -268,7 +268,7 @@ export function ShiftManagement() {
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap
               ${activeTab === tab.key
-                ? 'border-blue-600 text-blue-700'
+                ? 'border-dandy-500 text-dandy-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
             {tab.label}
           </button>
@@ -295,7 +295,7 @@ export function ShiftManagement() {
                     <div className="flex items-center gap-3">
                       <span className="font-medium text-gray-800">
                         {format(d, 'M/d', { locale: ja })}
-                        <span className={`ml-1 text-sm ${d.getDay() === 0 ? 'text-red-500' : d.getDay() === 6 ? 'text-blue-500' : 'text-gray-500'}`}>
+                        <span className={`ml-1 text-sm ${d.getDay() === 0 ? 'text-red-500' : d.getDay() === 6 ? 'text-dandy-400' : 'text-gray-500'}`}>
                           ({DOW[d.getDay()]})
                         </span>
                       </span>
@@ -314,7 +314,7 @@ export function ShiftManagement() {
                           </div>
                           <div className="flex items-center gap-1">
                             <button onClick={() => handleOpenEdit(slot)}
-                              className="text-gray-400 hover:text-blue-500 p-1" title="編集">
+                              className="text-gray-400 hover:text-dandy-400 p-1" title="編集">
                               <Pencil size={14} />
                             </button>
                             <button onClick={() => deleteShiftSlot(slot.id)}
@@ -350,7 +350,7 @@ export function ShiftManagement() {
                   <div className="bg-gray-50 px-4 py-2 border-b">
                     <span className="font-medium text-sm text-gray-700">
                       {format(d, 'M/d', { locale: ja })}
-                      <span className={`ml-1 ${d.getDay() === 0 ? 'text-red-500' : d.getDay() === 6 ? 'text-blue-500' : 'text-gray-500'}`}>
+                      <span className={`ml-1 ${d.getDay() === 0 ? 'text-red-500' : d.getDay() === 6 ? 'text-dandy-400' : 'text-gray-500'}`}>
                         ({DOW[d.getDay()]})
                       </span>
                     </span>
@@ -380,7 +380,7 @@ export function ShiftManagement() {
                                         <p className="text-sm text-gray-600 flex-1">
                                           <span className="text-xs text-gray-400 mr-1">{i + 1}.</span>
                                           シフト希望: <span className="font-medium">{m?.name ?? '?'}</span>
-                                          {m?.role === 'admin' && <span className="ml-1 text-xs text-blue-600">（管理者）</span>}
+                                          {m?.role === 'admin' && <span className="ml-1 text-xs text-dandy-500">（管理者）</span>}
                                           {m?.city && <span className="ml-1 text-xs text-gray-400">{m.city}</span>}
                                         </p>
                                         {/* ④ 誤データ削除ボタン */}
@@ -437,7 +437,7 @@ export function ShiftManagement() {
                   <div className="bg-green-50 px-4 py-2 border-b border-green-100">
                     <span className="font-medium text-sm text-green-800">
                       {format(d, 'M/d', { locale: ja })}
-                      <span className={`ml-1 ${d.getDay() === 0 ? 'text-red-500' : d.getDay() === 6 ? 'text-blue-600' : 'text-green-700'}`}>
+                      <span className={`ml-1 ${d.getDay() === 0 ? 'text-red-500' : d.getDay() === 6 ? 'text-dandy-500' : 'text-green-700'}`}>
                         ({DOW[d.getDay()]})
                       </span>
                     </span>
@@ -459,7 +459,7 @@ export function ShiftManagement() {
                             {assigned.map(m => m && (
                               <p key={m.id} className="text-sm text-gray-700">
                                 シフト: <span className="font-medium">{m.name}</span>
-                                {m.role === 'admin' && <span className="ml-1 text-xs text-blue-600">（管理者）</span>}
+                                {m.role === 'admin' && <span className="ml-1 text-xs text-dandy-500">（管理者）</span>}
                                 {m.city && <span className="ml-1 text-xs text-gray-400">{m.city}</span>}
                               </p>
                             ))}
@@ -490,7 +490,7 @@ export function ShiftManagement() {
             {/* 凡例 */}
             <div className="flex gap-3 mb-3 px-1 text-xs text-gray-500">
               <span className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded-sm bg-blue-100 border border-blue-200 inline-block" />
+                <span className="w-3 h-3 rounded-sm bg-dandy-100 border border-dandy-200 inline-block" />
                 募集中
               </span>
               <span className="flex items-center gap-1">
@@ -502,7 +502,7 @@ export function ShiftManagement() {
             <div className="grid grid-cols-7 mb-1">
               {DOW.map((d, i) => (
                 <div key={d} className={`text-center text-xs font-medium py-1
-                  ${i === 0 ? 'text-red-500' : i === 6 ? 'text-blue-500' : 'text-gray-500'}`}>
+                  ${i === 0 ? 'text-red-500' : i === 6 ? 'text-dandy-400' : 'text-gray-500'}`}>
                   {d}
                 </div>
               ))}
@@ -520,7 +520,7 @@ export function ShiftManagement() {
                 return (
                   <div key={i} className="bg-white p-1 min-h-16">
                     <p className={`text-xs font-medium mb-0.5 w-5 h-5 flex items-center justify-center rounded-full
-                      ${isToday ? 'bg-blue-600 text-white' : dow === 0 ? 'text-red-500' : dow === 6 ? 'text-blue-500' : 'text-gray-700'}`}>
+                      ${isToday ? 'bg-dandy-500 text-white' : dow === 0 ? 'text-red-500' : dow === 6 ? 'text-dandy-400' : 'text-gray-700'}`}>
                       {dayNum}
                     </p>
                     <div className="space-y-0.5">
@@ -529,7 +529,7 @@ export function ShiftManagement() {
                           className={`text-xs rounded px-1 py-0.5 truncate leading-tight
                             ${slot.status === 'confirmed'
                               ? 'bg-green-100 text-green-700 border border-green-200'
-                              : 'bg-blue-50 text-blue-700 border border-blue-100'}`}
+                              : 'bg-dandy-50 text-dandy-600 border border-dandy-100'}`}
                           title={`${slot.locationName}（必要${slot.requiredCount}名）`}>
                           {slot.locationName}
                         </div>
@@ -574,7 +574,7 @@ export function ShiftManagement() {
             </div>
             {error && <p className="text-red-500 text-xs">{error}</p>}
             <button onClick={handleAddSlot}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm hover:bg-blue-700">
+              className="w-full bg-dandy-500 text-white py-2 rounded-lg text-sm hover:bg-dandy-600">
               追加する
             </button>
           </div>
@@ -612,7 +612,7 @@ export function ShiftManagement() {
                 キャンセル
               </button>
               <button onClick={handleSaveEdit}
-                className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm hover:bg-blue-700">
+                className="flex-1 bg-dandy-500 text-white py-2 rounded-lg text-sm hover:bg-dandy-600">
                 保存する
               </button>
             </div>
@@ -664,7 +664,7 @@ export function ShiftManagement() {
             </div>
             {error && <p className="text-red-500 text-xs">{error}</p>}
             <button onClick={handleCopy}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm hover:bg-blue-700">
+              className="w-full bg-dandy-500 text-white py-2 rounded-lg text-sm hover:bg-dandy-600">
               コピーする
             </button>
           </div>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    width:1080px; height:1920px;
+    background:#FDF0E8;
+    font-family:'Noto Sans JP',sans-serif;
+    overflow:hidden; position:relative;
+  }
+  .bg1 { position:absolute; width:800px; height:800px; border-radius:50%; background:radial-gradient(circle,rgba(201,123,119,0.2) 0%,transparent 70%); top:-200px; right:-200px; }
+  .bg2 { position:absolute; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(244,162,97,0.15) 0%,transparent 70%); bottom:0; left:-150px; }
+  .dots { position:absolute; inset:0; background-image:radial-gradient(rgba(201,123,119,0.15) 1.5px,transparent 1.5px); background-size:34px 34px; }
+  .wrap { position:relative; z-index:10; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; padding:64px 52px 52px; }
+
+  /* ── TOP ── */
+  .tag { background:#C97B77; color:#fff; font-size:21px; font-weight:700; letter-spacing:3px; padding:8px 28px; border-radius:100px; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+  .script { font-family:'Dancing Script',cursive; font-size:68px; color:#C97B77; line-height:1; text-align:center; margin-bottom:6px; }
+  .headline { font-size:58px; font-weight:900; color:#3D1F1A; text-align:center; line-height:1.15; margin-bottom:8px; }
+  .sub { font-size:23px; color:#9B6B65; text-align:center; margin-bottom:36px; }
+
+  /* ── PHONE BASE ── */
+  .phone {
+    background:#fff;
+    border-radius:28px;
+    overflow:hidden;
+    box-shadow:0 16px 48px rgba(61,31,26,0.14), 0 3px 12px rgba(61,31,26,0.08);
+    border:2.5px solid rgba(201,123,119,0.25);
+    flex-shrink:0;
+  }
+  .ph-h { padding:16px 16px 12px; display:flex; align-items:center; gap:8px; }
+  .ph-dots { display:flex; gap:4px; }
+  .pd { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.45); }
+  .ph-title { font-size:15px; font-weight:700; color:#fff; }
+  .ph-badge { margin-left:auto; font-size:12px; background:rgba(255,255,255,0.22); color:#fff; padding:2px 9px; border-radius:100px; font-weight:700; }
+  .ph-body { padding:16px 15px 18px; background:#fafafa; }
+
+  .c-pink { background:#C97B77; }
+  .c-amber { background:#D4894A; }
+  .c-rose  { background:#B86B7A; }
+  .c-brown { background:#7D4E3C; }
+
+  /* ── ROW 1: 2 big phones ── */
+  .row-big { display:flex; gap:20px; width:100%; justify-content:center; margin-bottom:24px; }
+  .phone.big { width:462px; }
+
+  /* Staff response screen */
+  .sf-head { background:linear-gradient(135deg,#C97B77,#E8A88A); border-radius:12px; padding:14px 16px; margin-bottom:10px; color:#fff; }
+  .sf-h-name { font-size:20px; font-weight:900; margin-bottom:2px; }
+  .sf-h-dl { font-size:14px; opacity:0.85; }
+  .sf-slot { background:#fff; border-radius:10px; padding:13px 15px; margin-bottom:8px; border:1px solid #f0d8d4; display:flex; align-items:center; justify-content:space-between; }
+  .ss-loc { font-size:17px; font-weight:700; color:#3D1F1A; }
+  .ss-date { font-size:13px; color:#b08080; margin-top:2px; }
+  .tog-on { width:46px; height:26px; border-radius:13px; background:#C97B77; position:relative; flex-shrink:0; }
+  .tog-on::after { content:''; position:absolute; width:18px; height:18px; border-radius:50%; background:#fff; top:4px; right:4px; box-shadow:0 1px 4px rgba(0,0,0,0.2); }
+  .tog-off { width:46px; height:26px; border-radius:13px; background:#ddd; position:relative; flex-shrink:0; }
+  .tog-off::after { content:''; position:absolute; width:18px; height:18px; border-radius:50%; background:#fff; top:4px; left:4px; box-shadow:0 1px 4px rgba(0,0,0,0.15); }
+  .sf-note { font-size:13px; color:#b08080; text-align:center; margin-top:4px; padding:8px; background:#fce7e6; border-radius:8px; }
+
+  /* Admin dashboard */
+  .dash-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:10px; }
+  .ds { background:#fff; border:1px solid #f0d8d4; border-radius:10px; padding:12px 8px; text-align:center; }
+  .ds-n { font-size:26px; font-weight:900; color:#C97B77; }
+  .ds-l { font-size:12px; color:#b08080; margin-top:2px; }
+  .dash-row { background:#fff; border-radius:10px; padding:12px 14px; margin-bottom:8px; border:1px solid #f0d8d4; display:flex; align-items:center; justify-content:space-between; }
+  .dr-t { font-size:17px; font-weight:700; color:#3D1F1A; }
+  .dr-s { font-size:12px; color:#b08080; margin-top:2px; }
+  .bp { font-size:12px; font-weight:700; padding:4px 11px; border-radius:100px; background:#fce7e6; color:#C97B77; }
+  .bd { font-size:12px; font-weight:700; padding:4px 11px; border-radius:100px; background:#f3ede8; color:#b08080; }
+
+  /* ── SECURITY SECTION ── */
+  .sec-section {
+    width:100%; background:#3D1F1A; border-radius:22px;
+    padding:28px 36px; margin-bottom:24px;
+    display:flex; align-items:center; gap:28px;
+  }
+  .sec-icon-wrap {
+    width:80px; height:80px; border-radius:20px;
+    background:rgba(255,255,255,0.1);
+    display:flex; align-items:center; justify-content:center;
+    font-size:44px; flex-shrink:0;
+  }
+  .sec-title { font-size:26px; font-weight:900; color:#fff; margin-bottom:8px; }
+  .sec-tags { display:flex; flex-wrap:wrap; gap:8px; }
+  .sec-tag { font-size:16px; font-weight:700; padding:5px 14px; border-radius:100px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.85); }
+
+  /* ── ROW 2: 3 medium phones ── */
+  .row-mid { display:flex; gap:16px; width:100%; justify-content:center; margin-bottom:28px; }
+  .phone.mid { width:300px; }
+
+  /* Calendar */
+  .cal-title { font-size:16px; font-weight:700; color:#3D1F1A; text-align:center; margin-bottom:8px; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+  .cal-dow { font-size:11px; font-weight:700; color:#b08080; text-align:center; padding:2px 0; }
+  .cal-dow.sun { color:#E07070; } .cal-dow.sat { color:#7090D0; }
+  .cal-day { font-size:13px; font-weight:700; color:#3D1F1A; text-align:center; padding:4px 2px; border-radius:7px; min-height:34px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .cal-day.today { background:#C97B77; color:#fff; }
+  .cal-day.has { background:#fce7e6; }
+  .cdot { width:16px; height:5px; border-radius:3px; }
+  .cp { background:#C97B77; } .ca { background:#D4894A; } .cr { background:#B86B7A; }
+
+  /* Shift management */
+  .sm-slot { background:#fff; border-radius:10px; padding:11px 13px; margin-bottom:7px; border:1px solid #f0d8d4; }
+  .sm-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+  .sm-loc { font-size:14px; font-weight:700; color:#3D1F1A; }
+  .st-c { font-size:11px; font-weight:700; padding:2px 9px; border-radius:100px; background:#d1fae5; color:#059669; }
+  .st-o { font-size:11px; font-weight:700; padding:2px 9px; border-radius:100px; background:#fce7e6; color:#C97B77; }
+  .sm-meta { font-size:12px; color:#b08080; margin-bottom:4px; }
+  .sm-resp { display:flex; gap:4px; flex-wrap:wrap; }
+  .rc { font-size:11px; background:#fdf0e8; border:1px solid #f0d8d4; border-radius:100px; padding:2px 9px; color:#9B6B65; }
+
+  /* Staff list */
+  .mem-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #f5e8e6; }
+  .mem-row:last-child { border-bottom:none; }
+  .mav { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:#fff; flex-shrink:0; }
+  .mav.p { background:linear-gradient(135deg,#C97B77,#E8A88A); }
+  .mav.a { background:linear-gradient(135deg,#D4894A,#f0b98a); }
+  .mav.b { background:linear-gradient(135deg,#7D4E3C,#a07060); }
+  .mname { font-size:14px; font-weight:700; color:#3D1F1A; }
+  .mcity { font-size:12px; color:#b08080; }
+  .r-adm { margin-left:auto; font-size:11px; font-weight:700; padding:2px 9px; border-radius:100px; background:#fce7e6; color:#C97B77; }
+  .r-stf { margin-left:auto; font-size:11px; font-weight:700; padding:2px 9px; border-radius:100px; background:#f3ede8; color:#9B6B65; }
+
+  /* ── TECH ── */
+  .tech-wrap {
+    width:100%; background:rgba(61,31,26,0.06);
+    border:1.5px solid rgba(201,123,119,0.2);
+    border-radius:20px; padding:22px 28px;
+  }
+  .tech-label { font-family:'Dancing Script',cursive; font-size:32px; color:#C97B77; text-align:center; margin-bottom:14px; }
+  .tech-tags { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .tt { background:#fff; border:1.5px solid rgba(201,123,119,0.25); color:#3D1F1A; font-size:19px; font-weight:700; padding:8px 18px; border-radius:100px; }
+</style>
+</head>
+<body>
+<div class="bg1"></div><div class="bg2"></div><div class="dots"></div>
+<div class="wrap">
+
+  <div class="tag">
+    <svg width="34" height="24" viewBox="0 0 120 80" style="display:block;">
+      <path d="M60,40 C52,24 32,12 12,24 C22,22 34,30 42,36 C48,42 54,40 60,34 C66,40 72,42 78,36 C86,30 98,22 108,24 C88,12 68,24 60,40 Z" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+      <line x1="28" y1="38" x2="26" y2="55" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="25" cy="61" rx="4.5" ry="6" fill="#fff"/>
+    </svg>
+    Dandy Kitchen
+  </div>
+
+  <div class="script">Shift Manager</div>
+  <div class="headline">シフト管理アプリ</div>
+  <div class="sub">キッチンカーのシフトをまるごとデジタル化</div>
+
+  <!-- ROW 1 -->
+  <div class="row-big">
+
+    <div class="phone big">
+      <div class="ph-h c-amber">
+        <div class="ph-dots"><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+        <div class="ph-title">バイト用</div>
+        <div class="ph-badge">URLを開くだけ</div>
+      </div>
+      <div class="ph-body">
+        <div class="sf-head">
+          <div class="sf-h-name">2026年5月 シフト希望</div>
+          <div class="sf-h-dl">締切 5/10（日）23:59まで</div>
+        </div>
+        <div class="sf-slot"><div><div class="ss-loc">横浜スタジアム</div><div class="ss-date">5/6（水）· 3名募集</div></div><div class="tog-on"></div></div>
+        <div class="sf-slot"><div><div class="ss-loc">多摩センター</div><div class="ss-date">5/4（月）· 2名募集</div></div><div class="tog-off"></div></div>
+        <div class="sf-slot"><div><div class="ss-loc">味の素スタジアム</div><div class="ss-date">5/6（水）· 2名募集</div></div><div class="tog-on"></div></div>
+        <div class="sf-note">ログイン不要 · 回答はいつでも変更できます</div>
+      </div>
+    </div>
+
+    <div class="phone big">
+      <div class="ph-h c-pink">
+        <div class="ph-dots"><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+        <div class="ph-title">管理者ダッシュボード</div>
+      </div>
+      <div class="ph-body">
+        <div class="dash-stats">
+          <div class="ds"><div class="ds-n">8名</div><div class="ds-l">スタッフ</div></div>
+          <div class="ds"><div class="ds-n">12枠</div><div class="ds-l">今月確定</div></div>
+          <div class="ds"><div class="ds-n">3箇所</div><div class="ds-l">出店場所</div></div>
+        </div>
+        <div class="dash-row"><div><div class="dr-t">2026年5月</div><div class="dr-s">12枠 · 締切 5/10</div></div><span class="bp">募集中</span></div>
+        <div class="dash-row"><div><div class="dr-t">2026年6月</div><div class="dr-s">シフト枠 0件</div></div><span class="bd">下書き</span></div>
+        <div class="dash-row"><div><div class="dr-t">2026年4月</div><div class="dr-s">シフト枠 10件</div></div><span class="bd">締め切り</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SECURITY -->
+  <div class="sec-section">
+    <div class="sec-icon-wrap">🔐</div>
+    <div>
+      <div class="sec-title">セキュリティも本格実装</div>
+      <div class="sec-tags">
+        <span class="sec-tag">Google OAuth 2.0</span>
+        <span class="sec-tag">トークン管理</span>
+        <span class="sec-tag">セッション保持</span>
+        <span class="sec-tag">管理者権限制御</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2 -->
+  <div class="row-mid">
+
+    <div class="phone mid">
+      <div class="ph-h c-rose">
+        <div class="ph-dots"><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+        <div class="ph-title">カレンダー表示</div>
+      </div>
+      <div class="ph-body">
+        <div class="cal-title">2026年5月</div>
+        <div class="cal-grid">
+          <div class="cal-dow sun">日</div><div class="cal-dow">月</div><div class="cal-dow">火</div><div class="cal-dow">水</div><div class="cal-dow">木</div><div class="cal-dow">金</div><div class="cal-dow sat">土</div>
+          <div class="cal-day"></div><div class="cal-day"></div><div class="cal-day"></div><div class="cal-day"></div><div class="cal-day">1</div><div class="cal-day">2</div><div class="cal-day">3</div>
+          <div class="cal-day today">4<div class="cdot cp"></div></div><div class="cal-day">5</div><div class="cal-day has">6<div class="cdot ca"></div></div><div class="cal-day">7</div><div class="cal-day">8</div><div class="cal-day">9</div><div class="cal-day">10</div>
+          <div class="cal-day">11</div><div class="cal-day has">12<div class="cdot cr"></div></div><div class="cal-day">13</div><div class="cal-day">14</div><div class="cal-day">15</div><div class="cal-day has">16<div class="cdot cp"></div></div><div class="cal-day">17</div>
+          <div class="cal-day">18</div><div class="cal-day">19</div><div class="cal-day has">20<div class="cdot ca"></div></div><div class="cal-day">21</div><div class="cal-day">22</div><div class="cal-day">23</div><div class="cal-day">24</div>
+          <div class="cal-day">25</div><div class="cal-day has">26<div class="cdot cr"></div></div><div class="cal-day">27</div><div class="cal-day">28</div><div class="cal-day">29</div><div class="cal-day">30</div><div class="cal-day">31</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone mid">
+      <div class="ph-h c-brown">
+        <div class="ph-dots"><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+        <div class="ph-title">シフト管理</div>
+      </div>
+      <div class="ph-body">
+        <div class="sm-slot"><div class="sm-top"><span class="sm-loc">横浜スタジアム 5/6</span><span class="st-c">確定済み</span></div><div class="sm-meta">必要 3名 · 回答 5名</div><div class="sm-resp"><span class="rc">さくら ✓</span><span class="rc">けんじ ✓</span><span class="rc">みか ✓</span></div></div>
+        <div class="sm-slot"><div class="sm-top"><span class="sm-loc">多摩センター 5/4</span><span class="st-o">募集中</span></div><div class="sm-meta">必要 2名 · 回答 4名</div><div class="sm-resp"><span class="rc">ゆうき</span><span class="rc">あおい</span><span class="rc">+2名</span></div></div>
+        <div class="sm-slot"><div class="sm-top"><span class="sm-loc">味の素 5/6</span><span class="st-o">募集中</span></div><div class="sm-meta">必要 2名 · 回答 2名</div><div class="sm-resp"><span class="rc">そうたろう</span><span class="rc">はな</span></div></div>
+      </div>
+    </div>
+
+    <div class="phone mid">
+      <div class="ph-h c-pink">
+        <div class="ph-dots"><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+        <div class="ph-title">スタッフ管理</div>
+      </div>
+      <div class="ph-body">
+        <div class="mem-row"><div class="mav p">S</div><div><div class="mname">さくら</div><div class="mcity">横浜市</div></div><span class="r-adm">管理者</span></div>
+        <div class="mem-row"><div class="mav a">K</div><div><div class="mname">けんじ</div><div class="mcity">多摩市</div></div><span class="r-stf">バイト</span></div>
+        <div class="mem-row"><div class="mav b">M</div><div><div class="mname">みか</div><div class="mcity">調布市</div></div><span class="r-stf">バイト</span></div>
+        <div class="mem-row"><div class="mav a">Y</div><div><div class="mname">ゆうき</div><div class="mcity">世田谷区</div></div><span class="r-stf">バイト</span></div>
+        <div class="mem-row"><div class="mav p">A</div><div><div class="mname">あおい</div><div class="mcity">川崎市</div></div><span class="r-stf">バイト</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TECH -->
+  <div class="tech-wrap">
+    <div class="tech-label">Tech Stack</div>
+    <div class="tech-tags">
+      <div class="tt">⚛️ React</div>
+      <div class="tt">🔷 TypeScript</div>
+      <div class="tt">🌿 GitHub</div>
+      <div class="tt">🟩 Netlify</div>
+      <div class="tt">🔑 Google OAuth</div>
+      <div class="tt">📋 Google Sheets</div>
+      <div class="tt">⚡ GAS</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -22,11 +22,11 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* ヘッダー */}
-      <header className="bg-blue-700 text-white px-4 py-3 flex items-center justify-between shadow">
+      <header className="bg-dandy-500 text-white px-4 py-3 flex items-center justify-between shadow">
         <span className="font-bold text-lg tracking-wide">シフト管理</span>
         <div className="flex items-center gap-3 text-sm">
           <span className="hidden sm:block">{currentAdmin?.name}</span>
-          <button onClick={handleLogout} className="flex items-center gap-1 hover:text-blue-200">
+          <button onClick={handleLogout} className="flex items-center gap-1 hover:text-dandy-100">
             <LogOut size={16} />
             <span className="hidden sm:block">ログアウト</span>
           </button>
@@ -40,8 +40,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             <Link
               key={to}
               to={to}
-              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium hover:bg-blue-50 hover:text-blue-700 transition-colors
-                ${pathname.startsWith(to) ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600' : 'text-gray-600'}`}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium hover:bg-dandy-50 hover:text-dandy-600 transition-colors
+                ${pathname.startsWith(to) ? 'bg-dandy-50 text-dandy-600 border-r-2 border-dandy-500' : 'text-gray-600'}`}
             >
               <Icon size={18} />
               {label}
@@ -60,7 +60,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             key={to}
             to={to}
             className={`flex-1 flex flex-col items-center py-2 text-xs
-              ${pathname.startsWith(to) ? 'text-blue-700' : 'text-gray-500'}`}
+              ${pathname.startsWith(to) ? 'text-dandy-500' : 'text-gray-500'}`}
           >
             <Icon size={20} />
             {label}

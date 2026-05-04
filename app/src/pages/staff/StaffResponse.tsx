@@ -213,7 +213,7 @@ export function StaffResponse() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Loader2 className="animate-spin mx-auto mb-2 text-blue-600" size={32} />
+          <Loader2 className="animate-spin mx-auto mb-2 text-dandy-500" size={32} />
           <p className="text-gray-500 text-sm">シフトデータを読み込み中...</p>
         </div>
       </div>
@@ -281,10 +281,10 @@ export function StaffResponse() {
   // ─── 未登録 → 登録フォーム ────────────────────
   if (!memberId || (!isAdminMode && !localStorage.getItem('staff_name'))) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-dandy-50 to-dandy-100 p-4">
         <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-8">
           <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 bg-dandy-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
               <span className="text-white text-xl">📅</span>
             </div>
             <h1 className="font-bold text-gray-800">{shiftMonth.year}年{shiftMonth.month}月 シフト希望</h1>
@@ -314,7 +314,7 @@ export function StaffResponse() {
             </div>
             {regError && <p className="text-red-500 text-xs">{regError}</p>}
             <button onClick={handleRegister} disabled={regLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 flex items-center justify-center gap-2">
+              className="w-full bg-dandy-500 hover:bg-dandy-600 text-white py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 flex items-center justify-center gap-2">
               {regLoading && <Loader2 size={14} className="animate-spin" />}
               登録してシフトを見る
             </button>
@@ -336,11 +336,11 @@ export function StaffResponse() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-blue-700 text-white px-4 py-3">
+      <header className="bg-dandy-600 text-white px-4 py-3">
         <h1 className="font-bold">{shiftMonth.year}年{shiftMonth.month}月 シフト希望</h1>
-        <p className="text-sm text-blue-200">こんにちは、{displayName}さん</p>
+        <p className="text-sm text-dandy-200">こんにちは、{displayName}さん</p>
         {shiftMonth.deadlineAt && (
-          <p className="text-xs text-blue-200 mt-0.5">
+          <p className="text-xs text-dandy-200 mt-0.5">
             締切: {format(new Date(shiftMonth.deadlineAt), 'M/d(E) HH:mm', { locale: ja })}
           </p>
         )}
@@ -349,7 +349,7 @@ export function StaffResponse() {
       <div className="max-w-lg mx-auto p-4 space-y-4 pb-28">
         <p className="text-sm text-gray-600">参加できる日付・場所をタップして選択してください</p>
         {selectedCount > 0 && (
-          <p className="text-xs text-blue-600 bg-blue-50 rounded-lg px-3 py-2">
+          <p className="text-xs text-dandy-500 bg-dandy-50 rounded-lg px-3 py-2">
             前回の回答が読み込まれています。変更がある場合はタップしてください。
           </p>
         )}
@@ -361,7 +361,7 @@ export function StaffResponse() {
               <div className="bg-gray-50 px-4 py-2 border-b">
                 <span className="font-medium text-sm text-gray-700">
                   {format(d, 'M月d日', { locale: ja })}
-                  <span className={`ml-1 ${d.getDay() === 0 ? 'text-red-500' : d.getDay() === 6 ? 'text-blue-500' : 'text-gray-500'}`}>
+                  <span className={`ml-1 ${d.getDay() === 0 ? 'text-red-500' : d.getDay() === 6 ? 'text-dandy-400' : 'text-gray-500'}`}>
                     ({DOW[d.getDay()]})
                   </span>
                 </span>
@@ -373,9 +373,9 @@ export function StaffResponse() {
                   return (
                     <button key={slot.id} onClick={() => handleToggle(slot.id)}
                       className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors
-                        ${isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
+                        ${isSelected ? 'bg-dandy-50' : 'hover:bg-gray-50'}`}>
                       <div>
-                        <p className={`font-medium text-sm ${isSelected ? 'text-blue-700' : 'text-gray-800'}`}>
+                        <p className={`font-medium text-sm ${isSelected ? 'text-dandy-600' : 'text-gray-800'}`}>
                           {slot.locationName}
                         </p>
                         <p className="text-xs text-gray-400">
@@ -384,7 +384,7 @@ export function StaffResponse() {
                         </p>
                       </div>
                       <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0
-                        ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-gray-300'}`}>
+                        ${isSelected ? 'border-dandy-500 bg-dandy-500' : 'border-gray-300'}`}>
                         {isSelected && <CheckCircle2 size={14} className="text-white" />}
                       </div>
                     </button>
@@ -400,7 +400,7 @@ export function StaffResponse() {
         <div className="max-w-lg mx-auto flex items-center gap-3">
           <span className="text-sm text-gray-600">{selectedCount}枠選択中</span>
           <button onClick={handleSubmit}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl text-sm transition-colors">
+            className="flex-1 bg-dandy-500 hover:bg-dandy-600 text-white font-medium py-3 rounded-xl text-sm transition-colors">
             {submitted ? '✓ 回答を保存しました' : '回答を確定する'}
           </button>
         </div>

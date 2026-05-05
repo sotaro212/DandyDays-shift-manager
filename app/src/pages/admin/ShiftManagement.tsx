@@ -14,7 +14,7 @@ type Tab = 'slots' | 'responses' | 'confirmed' | 'calendar'
 export function ShiftManagement() {
   const { data, createShiftMonth, addShiftSlot, updateShiftSlot, deleteShiftSlot,
           publishShiftMonth, closeShiftMonth, copyShiftSlots, confirmShiftSlot,
-          getSlotResponses, deleteStaffResponse, refreshData, isLoadingSheets } = useStoreContext()
+          getSlotResponses, deleteStaffResponse, submitResponse, refreshData, isLoadingSheets } = useStoreContext()
 
   const now = new Date()
   const [selYear, setSelYear] = useState(now.getFullYear())
@@ -41,6 +41,14 @@ export function ShiftManagement() {
 
   // カレンダー詳細ポップアップ（④）
   const [calendarPopupSlot, setCalendarPopupSlot] = useState<ShiftSlot | null>(null)
+
+  // シフト希望タブ：手動追加
+  const [manualAddSlotId, setManualAddSlotId] = useState<string | null>(null)
+  const [manualAddMemberId, setManualAddMemberId] = useState('')
+
+  // 確定モーダル：非回答メンバーの追加
+  const [extraMemberIds, setExtrasMemberIds] = useState<string[]>([])
+  const [extraPickerId, setExtraPickerId] = useState('')
 
   // LINE共有テキスト
   const [lineCopied, setLineCopied] = useState(false)
@@ -143,17 +151,31 @@ export function ShiftManagement() {
     setShowCopy(false); setError('')
   }
 
+  const handleManualAdd = (slotId: string) => {
+    if (!manualAddMemberId) return
+    submitResponse(slotId, manualAddMemberId, true)
+    setManualAddSlotId(null)
+    setManualAddMemberId('')
+  }
+
   const openConfirm = (slot: ShiftSlot) => {
     const responses = getSlotResponses(slot.id)
     setSelectedMembers(responses.slice(0, slot.requiredCount).map(r => r.memberId))
+    setExtrasMemberIds([])
+    setExtraPickerId('')
     setShowConfirm(slot)
   }
 
   const handleConfirm = () => {
     if (!showConfirm) return
     try {
-      confirmShiftSlot(showConfirm.id, selectedMembers)
-      setShowConfirm(null); setError('')
+      // 未回答だが追加されたメンバーの回答を先に登録（functional updateで直列処理される）
+      for (const id of extraMemberIds) {
+        const hasResp = data.staffResponses.some(r => r.shiftSlotId === showConfirm.id && r.memberId === id)
+        if (!hasResp) submitResponse(showConfirm.id, id, true)
+      }
+      confirmShiftSlot(showConfirm.id, [...selectedMembers, ...extraMemberIds])
+      setShowConfirm(null); setError(''); setExtrasMemberIds([]); setExtraPickerId('')
     } catch (e) {
       setError(String(e))
     }
@@ -441,6 +463,38 @@ export function ShiftManagement() {
                                 </div>
                               ) : (
                                 <p className="text-xs text-gray-400 mt-1">まだ回答がありません</p>
+                              )}
+
+                              {/* 手動追加 */}
+                              {manualAddSlotId === slot.id ? (
+                                <div className="mt-2 flex items-center gap-2">
+                                  <select
+                                    value={manualAddMemberId}
+                                    onChange={e => setManualAddMemberId(e.target.value)}
+                                    className="flex-1 text-xs border rounded px-2 py-1.5">
+                                    <option value="">メンバーを選択</option>
+                                    {data.members
+                                      .filter(m => !responses.some(r => r.memberId === m.id))
+                                      .map(m => (
+                                        <option key={m.id} value={m.id}>{m.name}</option>
+                                      ))}
+                                  </select>
+                                  <button onClick={() => handleManualAdd(slot.id)}
+                                    disabled={!manualAddMemberId}
+                                    className="text-xs bg-dandy-500 text-white px-3 py-1.5 rounded-lg hover:bg-dandy-600 disabled:opacity-40 shrink-0">
+                                    追加
+                                  </button>
+                                  <button onClick={() => { setManualAddSlotId(null); setManualAddMemberId('') }}
+                                    className="text-xs text-gray-400 hover:text-gray-600 shrink-0">
+                                    <X size={14} />
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => { setManualAddSlotId(slot.id); setManualAddMemberId('') }}
+                                  className="mt-2 text-xs text-dandy-500 hover:text-dandy-600 flex items-center gap-1">
+                                  <Plus size={12} /> 口頭回答を手動追加
+                                </button>
                               )}
                             </div>
                             {responses.length > 0 && (
@@ -785,13 +839,14 @@ export function ShiftManagement() {
                 <p className="text-sm text-gray-400 text-center py-2">まだ回答がありません</p>
               )}
 
-              {slot.status !== 'confirmed' && (
-                <button
-                  onClick={() => { setCalendarPopupSlot(null); openConfirm(slot) }}
-                  className="w-full bg-green-600 text-white py-2 rounded-lg text-sm hover:bg-green-700">
-                  シフトを確定する
-                </button>
-              )}
+              <button
+                onClick={() => { setCalendarPopupSlot(null); openConfirm(slot) }}
+                className={`w-full py-2 rounded-lg text-sm font-medium
+                  ${slot.status === 'confirmed'
+                    ? 'border border-dandy-300 text-dandy-600 hover:bg-dandy-50'
+                    : 'bg-green-600 text-white hover:bg-green-700'}`}>
+                {slot.status === 'confirmed' ? '✏️ 担当を変更する' : 'シフトを確定する'}
+              </button>
             </div>
           </Modal>
         )
@@ -823,17 +878,57 @@ export function ShiftManagement() {
                   )
                 })}
               </div>
-              {selectedMembers.length > 0 && !data.members.filter(m => selectedMembers.includes(m.id) && m.role === 'admin').length && (
+              {(selectedMembers.length > 0 || extraMemberIds.length > 0) && !data.members.filter(m => [...selectedMembers, ...extraMemberIds].includes(m.id) && m.role === 'admin').length && (
                 <div className="flex items-center gap-1.5 mt-2 text-xs text-amber-600 bg-amber-50 rounded p-2">
                   <AlertCircle size={13} />
                   管理者を1名以上選択してください
                 </div>
               )}
             </div>
+
+            {/* 未回答メンバーを口頭追加 */}
+            <div>
+              <p className="text-sm font-medium mb-2 text-gray-600">口頭回答のメンバーを追加</p>
+              {extraMemberIds.length > 0 && (
+                <div className="mb-2 space-y-1">
+                  {extraMemberIds.map(id => {
+                    const m = data.members.find(mb => mb.id === id)
+                    return m ? (
+                      <div key={id} className="flex items-center gap-2 text-sm bg-dandy-50 rounded px-3 py-1.5">
+                        <span className="flex-1 text-dandy-700 font-medium">{m.name}</span>
+                        <button
+                          onClick={() => setExtrasMemberIds(prev => prev.filter(i => i !== id))}
+                          className="text-gray-400 hover:text-red-500">
+                          <X size={13} />
+                        </button>
+                      </div>
+                    ) : null
+                  })}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <select value={extraPickerId} onChange={e => setExtraPickerId(e.target.value)}
+                  className="flex-1 text-xs border rounded px-2 py-1.5">
+                  <option value="">未回答のメンバーを選択</option>
+                  {data.members
+                    .filter(m => !getSlotResponses(showConfirm!.id).some(r => r.memberId === m.id) && !extraMemberIds.includes(m.id))
+                    .map(m => (
+                      <option key={m.id} value={m.id}>{m.name}</option>
+                    ))}
+                </select>
+                <button
+                  onClick={() => { if (extraPickerId) { setExtrasMemberIds(prev => [...prev, extraPickerId]); setExtraPickerId('') } }}
+                  disabled={!extraPickerId}
+                  className="text-xs bg-dandy-500 text-white px-3 py-1.5 rounded-lg hover:bg-dandy-600 disabled:opacity-40 shrink-0">
+                  追加
+                </button>
+              </div>
+            </div>
+
             {error && <p className="text-red-500 text-xs">{error}</p>}
             <button onClick={handleConfirm}
               className="w-full bg-green-600 text-white py-2 rounded-lg text-sm hover:bg-green-700">
-              確定する
+              {showConfirm?.status === 'confirmed' ? '変更を保存する' : '確定する'}
             </button>
           </div>
         </Modal>

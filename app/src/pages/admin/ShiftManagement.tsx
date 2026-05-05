@@ -39,6 +39,9 @@ export function ShiftManagement() {
   const [gasUrl, setGasUrlState] = useState(() => getGasUrl() ?? '')
   const [showGasInput, setShowGasInput] = useState(false)
 
+  // カレンダー詳細ポップアップ（④）
+  const [calendarPopupSlot, setCalendarPopupSlot] = useState<ShiftSlot | null>(null)
+
   // 編集モーダル（①）
   const [editingSlot, setEditingSlot] = useState<ShiftSlot | null>(null)
   const [editDate, setEditDate] = useState('')
@@ -236,6 +239,7 @@ export function ShiftManagement() {
               コピー
             </button>
           </div>
+          <p className="text-xs text-white/90">↑ このURLをコピーしてLINEでバイトに共有してください</p>
           <button onClick={() => setShowGasInput(v => !v)}
             className="text-xs text-white/80 underline hover:text-white">
             {gasUrl ? '✓ GAS URL設定済み（変更する）' : 'GAS URLを設定する'}
@@ -526,10 +530,11 @@ export function ShiftManagement() {
                     <div className="space-y-0.5">
                       {daySlots.map(slot => (
                         <div key={slot.id}
-                          className={`text-xs rounded px-1 py-0.5 truncate leading-tight
+                          onClick={() => setCalendarPopupSlot(slot)}
+                          className={`text-xs rounded px-1 py-0.5 truncate leading-tight cursor-pointer
                             ${slot.status === 'confirmed'
-                              ? 'bg-green-100 text-green-700 border border-green-200'
-                              : 'bg-dandy-50 text-dandy-600 border border-dandy-100'}`}
+                              ? 'bg-green-100 text-green-700 border border-green-200 hover:bg-green-200'
+                              : 'bg-dandy-50 text-dandy-600 border border-dandy-100 hover:bg-dandy-100'}`}
                           title={`${slot.locationName}（必要${slot.requiredCount}名）`}>
                           {slot.locationName}
                         </div>
@@ -670,6 +675,80 @@ export function ShiftManagement() {
           </div>
         </Modal>
       )}
+
+      {/* カレンダー詳細ポップアップ（④） */}
+      {calendarPopupSlot && (() => {
+        const slot = calendarPopupSlot
+        const responses = getSlotResponses(slot.id)
+        const assignedResponses = responses.filter(r => r.isAssigned)
+        const availableResponses = responses.filter(r => !r.isAssigned)
+        return (
+          <Modal
+            title={format(parseISO(slot.date), 'M月d日(E)', { locale: ja })}
+            onClose={() => setCalendarPopupSlot(null)}>
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <p className="font-semibold text-gray-800">{slot.locationName}</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {slot.status === 'confirmed'
+                    ? <Badge label="確定済み" variant="green" />
+                    : <Badge label="募集中" variant="blue" />}
+                  <span className="text-xs text-gray-500">必要 {slot.requiredCount}名</span>
+                </div>
+                {slot.note && <p className="text-xs text-gray-500 bg-gray-50 rounded px-2 py-1">{slot.note}</p>}
+              </div>
+
+              {assignedResponses.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-2 text-green-700">確定メンバー ({assignedResponses.length}名)</p>
+                  <div className="space-y-1">
+                    {assignedResponses.map(r => {
+                      const m = data.members.find(mb => mb.id === r.memberId)
+                      return m ? (
+                        <div key={r.id} className="flex items-center gap-2 text-sm bg-green-50 rounded px-3 py-1.5">
+                          <CheckCircle2 size={13} className="text-green-600 shrink-0" />
+                          <span className="font-medium text-green-800">{m.name}</span>
+                          {m.city && <span className="text-xs text-gray-400">{m.city}</span>}
+                        </div>
+                      ) : null
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {availableResponses.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-2 text-gray-700">参加可能 ({availableResponses.length}名)</p>
+                  <div className="space-y-1 max-h-40 overflow-y-auto">
+                    {availableResponses.map(r => {
+                      const m = data.members.find(mb => mb.id === r.memberId)
+                      return m ? (
+                        <div key={r.id} className="flex items-center gap-2 text-sm bg-dandy-50 rounded px-3 py-1.5">
+                          <UserCheck size={13} className="text-dandy-500 shrink-0" />
+                          <span className="text-gray-700">{m.name}</span>
+                          {m.city && <span className="text-xs text-gray-400">{m.city}</span>}
+                        </div>
+                      ) : null
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {responses.length === 0 && (
+                <p className="text-sm text-gray-400 text-center py-2">まだ回答がありません</p>
+              )}
+
+              {slot.status !== 'confirmed' && (
+                <button
+                  onClick={() => { setCalendarPopupSlot(null); openConfirm(slot) }}
+                  className="w-full bg-green-600 text-white py-2 rounded-lg text-sm hover:bg-green-700">
+                  シフトを確定する
+                </button>
+              )}
+            </div>
+          </Modal>
+        )
+      })()}
 
       {showConfirm && (
         <Modal title="シフトを確定" onClose={() => { setShowConfirm(null); setError('') }}>

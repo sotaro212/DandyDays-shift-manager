@@ -335,7 +335,7 @@ export function StaffResponse() {
   const displayName = isAdminMode ? member?.name : localStorage.getItem('staff_name') ?? ''
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-dandy-50 overflow-x-hidden">
       <header className="bg-dandy-600 text-white px-4 py-3">
         <h1 className="font-bold">{shiftMonth.year}年{shiftMonth.month}月 シフト希望</h1>
         <p className="text-sm text-dandy-200">こんにちは、{displayName}さん</p>

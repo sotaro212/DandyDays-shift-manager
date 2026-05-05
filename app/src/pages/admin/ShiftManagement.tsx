@@ -46,9 +46,6 @@ export function ShiftManagement() {
   const [manualAddSlotId, setManualAddSlotId] = useState<string | null>(null)
   const [manualAddMemberId, setManualAddMemberId] = useState('')
 
-  // 確定モーダル：非回答メンバーの追加
-  const [extraMemberIds, setExtrasMemberIds] = useState<string[]>([])
-  const [extraPickerId, setExtraPickerId] = useState('')
 
   // LINE共有テキスト
   const [lineCopied, setLineCopied] = useState(false)
@@ -161,21 +158,19 @@ export function ShiftManagement() {
   const openConfirm = (slot: ShiftSlot) => {
     const responses = getSlotResponses(slot.id)
     setSelectedMembers(responses.slice(0, slot.requiredCount).map(r => r.memberId))
-    setExtrasMemberIds([])
-    setExtraPickerId('')
     setShowConfirm(slot)
   }
 
   const handleConfirm = () => {
     if (!showConfirm) return
     try {
-      // 未回答だが追加されたメンバーの回答を先に登録（functional updateで直列処理される）
-      for (const id of extraMemberIds) {
+      // 回答なしで選ばれたメンバーの回答を先に作成（functional updateで直列キュー処理される）
+      for (const id of selectedMembers) {
         const hasResp = data.staffResponses.some(r => r.shiftSlotId === showConfirm.id && r.memberId === id)
         if (!hasResp) submitResponse(showConfirm.id, id, true)
       }
-      confirmShiftSlot(showConfirm.id, [...selectedMembers, ...extraMemberIds])
-      setShowConfirm(null); setError(''); setExtrasMemberIds([]); setExtraPickerId('')
+      confirmShiftSlot(showConfirm.id, selectedMembers)
+      setShowConfirm(null); setError('')
     } catch (e) {
       setError(String(e))
     }
@@ -852,87 +847,67 @@ export function ShiftManagement() {
         )
       })()}
 
-      {showConfirm && (
-        <Modal title="シフトを確定" onClose={() => { setShowConfirm(null); setError('') }}>
-          <div className="space-y-4">
-            <p className="text-sm text-gray-600">
-              {format(parseISO(showConfirm.date), 'M/d(E)', { locale: ja })} ・ {showConfirm.locationName} ・ 必要 {showConfirm.requiredCount}名
-            </p>
-            <div>
-              <p className="text-sm font-medium mb-2">アサインするスタッフを選択</p>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {getSlotResponses(showConfirm.id).map(resp => {
-                  const member = data.members.find(m => m.id === resp.memberId)
-                  if (!member) return null
-                  const checked = selectedMembers.includes(member.id)
-                  return (
-                    <label key={member.id} className="flex items-center gap-2 text-sm cursor-pointer p-2 rounded hover:bg-gray-50">
-                      <input type="checkbox" checked={checked}
-                        onChange={e => setSelectedMembers(prev =>
-                          e.target.checked ? [...prev, member.id] : prev.filter(id => id !== member.id)
-                        )} />
-                      <span className="flex-1">{member.name}</span>
-                      {member.role === 'admin' && <Badge label="管理者" variant="blue" />}
-                      {member.city && <span className="text-xs text-gray-400">{member.city}</span>}
-                    </label>
-                  )
-                })}
+      {showConfirm && (() => {
+        const respondedIds = new Set(getSlotResponses(showConfirm.id).map(r => r.memberId))
+        return (
+          <Modal
+            title={showConfirm.status === 'confirmed' ? '担当メンバーを変更' : 'シフトを確定'}
+            onClose={() => { setShowConfirm(null); setError('') }}>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-500">
+                {format(parseISO(showConfirm.date), 'M/d(E)', { locale: ja })} ・ {showConfirm.locationName} ・ 必要 {showConfirm.requiredCount}名
+              </p>
+
+              <div>
+                <p className="text-sm font-medium mb-2">担当するスタッフを選択</p>
+                <div className="space-y-1 max-h-56 overflow-y-auto border rounded-lg p-1">
+                  {data.members.map(member => {
+                    const checked = selectedMembers.includes(member.id)
+                    const hasResponse = respondedIds.has(member.id)
+                    return (
+                      <label key={member.id}
+                        className={`flex items-center gap-3 text-sm cursor-pointer px-3 py-2 rounded-lg transition-colors
+                          ${checked ? 'bg-green-50' : 'hover:bg-gray-50'}`}>
+                        <input type="checkbox" checked={checked}
+                          onChange={e => setSelectedMembers(prev =>
+                            e.target.checked ? [...prev, member.id] : prev.filter(id => id !== member.id)
+                          )} />
+                        <span className={`flex-1 font-medium ${checked ? 'text-green-800' : 'text-gray-700'}`}>
+                          {member.name}
+                        </span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {hasResponse && <Badge label="回答済" variant="green" />}
+                          {member.role === 'admin' && <Badge label="管理者" variant="blue" />}
+                          {member.city && <span className="text-xs text-gray-400">{member.city}</span>}
+                        </div>
+                      </label>
+                    )
+                  })}
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  選択中: {selectedMembers.length}名
+                  {selectedMembers.length > 0 && selectedMembers.length !== showConfirm.requiredCount && (
+                    <span className="ml-1 text-amber-500">（必要人数: {showConfirm.requiredCount}名）</span>
+                  )}
+                </p>
               </div>
-              {(selectedMembers.length > 0 || extraMemberIds.length > 0) && !data.members.filter(m => [...selectedMembers, ...extraMemberIds].includes(m.id) && m.role === 'admin').length && (
-                <div className="flex items-center gap-1.5 mt-2 text-xs text-amber-600 bg-amber-50 rounded p-2">
+
+              {selectedMembers.length > 0 && !data.members.filter(m => selectedMembers.includes(m.id) && m.role === 'admin').length && (
+                <div className="flex items-center gap-1.5 text-xs text-amber-600 bg-amber-50 rounded p-2">
                   <AlertCircle size={13} />
                   管理者を1名以上選択してください
                 </div>
               )}
-            </div>
 
-            {/* 未回答メンバーを口頭追加 */}
-            <div>
-              <p className="text-sm font-medium mb-2 text-gray-600">口頭回答のメンバーを追加</p>
-              {extraMemberIds.length > 0 && (
-                <div className="mb-2 space-y-1">
-                  {extraMemberIds.map(id => {
-                    const m = data.members.find(mb => mb.id === id)
-                    return m ? (
-                      <div key={id} className="flex items-center gap-2 text-sm bg-dandy-50 rounded px-3 py-1.5">
-                        <span className="flex-1 text-dandy-700 font-medium">{m.name}</span>
-                        <button
-                          onClick={() => setExtrasMemberIds(prev => prev.filter(i => i !== id))}
-                          className="text-gray-400 hover:text-red-500">
-                          <X size={13} />
-                        </button>
-                      </div>
-                    ) : null
-                  })}
-                </div>
-              )}
-              <div className="flex gap-2">
-                <select value={extraPickerId} onChange={e => setExtraPickerId(e.target.value)}
-                  className="flex-1 text-xs border rounded px-2 py-1.5">
-                  <option value="">未回答のメンバーを選択</option>
-                  {data.members
-                    .filter(m => !getSlotResponses(showConfirm!.id).some(r => r.memberId === m.id) && !extraMemberIds.includes(m.id))
-                    .map(m => (
-                      <option key={m.id} value={m.id}>{m.name}</option>
-                    ))}
-                </select>
-                <button
-                  onClick={() => { if (extraPickerId) { setExtrasMemberIds(prev => [...prev, extraPickerId]); setExtraPickerId('') } }}
-                  disabled={!extraPickerId}
-                  className="text-xs bg-dandy-500 text-white px-3 py-1.5 rounded-lg hover:bg-dandy-600 disabled:opacity-40 shrink-0">
-                  追加
-                </button>
-              </div>
+              {error && <p className="text-red-500 text-xs">{error}</p>}
+              <button onClick={handleConfirm}
+                className="w-full bg-green-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-green-700">
+                {showConfirm.status === 'confirmed' ? '変更を保存する' : '確定する'}
+              </button>
             </div>
-
-            {error && <p className="text-red-500 text-xs">{error}</p>}
-            <button onClick={handleConfirm}
-              className="w-full bg-green-600 text-white py-2 rounded-lg text-sm hover:bg-green-700">
-              {showConfirm?.status === 'confirmed' ? '変更を保存する' : '確定する'}
-            </button>
-          </div>
-        </Modal>
-      )}
+          </Modal>
+        )
+      })()}
     </div>
   )
 }

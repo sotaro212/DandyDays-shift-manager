@@ -9,7 +9,7 @@ import { StaffResponse } from '@/pages/staff/StaffResponse'
 
 function AdminGuard() {
   const { currentAdmin } = useStoreContext()
-  if (!currentAdmin) return <Navigate to="/admin/login" replace />
+  if (!currentAdmin || currentAdmin.role !== 'admin') return <Navigate to="/admin/login" replace />
   return (
     <AdminLayout>
       <Outlet />

@@ -72,53 +72,58 @@ export function useStore() {
 
   // ─── Google ログイン ─────────────────────────────────
   const loginWithGoogle = useCallback(async (): Promise<'needs_setup' | 'ready'> => {
-    // GISポップアップを開いてトークンを取得（ユーザー操作に直接応答するので許可される）
     const token = await requestAccessToken()
     const userInfo = await fetchUserInfo(token)
-
     const sheetId = localStorage.getItem(SHEET_ID_KEY)
 
-    // メンバー登録 or 更新
-    let resolvedMemberId = ''
-    update(prev => {
-      let member = prev.members.find(m => m.email === userInfo.email)
-      const isFirstAdmin = prev.members.filter(m => m.role === 'admin').length === 0
-      if (!member) {
-        member = {
-          id: generateId(),
-          name: userInfo.name,
-          email: userInfo.email,
-          city: '',
-          role: isFirstAdmin ? 'admin' : 'user',
-          createdAt: new Date().toISOString(),
-          lastAccessedAt: new Date().toISOString(),
+    // ── シート未設定：初回セットアップへ ──────────────────
+    if (!sheetId) {
+      let newId = ''
+      update(prev => {
+        const isFirstAdmin = prev.members.filter(m => m.role === 'admin').length === 0
+        let member = prev.members.find(m => m.email === userInfo.email)
+        if (!member) {
+          member = {
+            id: generateId(), name: userInfo.name, email: userInfo.email, city: '',
+            role: isFirstAdmin ? 'admin' : 'user',
+            createdAt: new Date().toISOString(), lastAccessedAt: new Date().toISOString(),
+          }
+          newId = member.id
+          return { ...prev, members: [...prev.members, member], currentAdminId: member.id }
         }
-        resolvedMemberId = member.id
-        return { ...prev, members: [...prev.members, member], currentAdminId: member.id }
-      }
-      resolvedMemberId = member.id
-      const updated = prev.members.map(m =>
-        m.id === member!.id ? { ...m, lastAccessedAt: new Date().toISOString() } : m
-      )
-      return { ...prev, members: updated, currentAdminId: member.id }
-    })
-    if (resolvedMemberId) sessionStorage.setItem(ADMIN_SESSION_KEY, resolvedMemberId)
+        newId = member.id
+        const updated = prev.members.map(m =>
+          m.id === member!.id ? { ...m, lastAccessedAt: new Date().toISOString() } : m
+        )
+        return { ...prev, members: updated, currentAdminId: member.id }
+      })
+      if (newId) sessionStorage.setItem(ADMIN_SESSION_KEY, newId)
+      return 'needs_setup'
+    }
 
-    if (!sheetId) return 'needs_setup'
-
-    // 既存シートからデータ読み込み
+    // ── シート設定済み：リモートデータを先に読んで権限チェック ──
+    setIsLoadingSheets(true)
     try {
-      setIsLoadingSheets(true)
       const exists = await checkSpreadsheetExists(token, sheetId)
       if (!exists) return 'needs_setup'
 
       const remoteData = await loadAllData(token, sheetId)
-      setData(prev => {
-        const member = remoteData.members.find(m => m.email === userInfo.email)
-        const merged = { ...remoteData, currentAdminId: member?.id ?? prev.currentAdminId }
+
+      // 管理者権限チェック
+      const member = remoteData.members.find(m => m.email === userInfo.email)
+      if (!member || member.role !== 'admin') {
+        throw new Error(
+          '管理者権限がありません。\n' +
+          'スタッフ管理画面にて管理者に権限付与を依頼してください。'
+        )
+      }
+
+      setData(() => {
+        const merged = { ...remoteData, currentAdminId: member.id }
         saveCache(merged)
         return merged
       })
+      sessionStorage.setItem(ADMIN_SESSION_KEY, member.id)
     } finally {
       setIsLoadingSheets(false)
     }

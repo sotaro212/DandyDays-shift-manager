@@ -7,6 +7,7 @@ import {
 } from '@/services/sheetsService'
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string
+const DEFAULT_SHEET_ID = (import.meta.env.VITE_SPREADSHEET_ID as string) || ''
 const SHEET_ID_KEY = 'shift_spreadsheet_id'
 const LOCAL_CACHE_KEY = 'shift_manager_cache'
 const ADMIN_SESSION_KEY = 'shift_current_admin_id'
@@ -74,7 +75,7 @@ export function useStore() {
   const loginWithGoogle = useCallback(async (): Promise<'needs_setup' | 'ready'> => {
     const token = await requestAccessToken()
     const userInfo = await fetchUserInfo(token)
-    const sheetId = localStorage.getItem(SHEET_ID_KEY)
+    const sheetId = localStorage.getItem(SHEET_ID_KEY) || DEFAULT_SHEET_ID || null
 
     // ── シート未設定：初回セットアップへ ──────────────────
     if (!sheetId) {
@@ -118,6 +119,11 @@ export function useStore() {
         )
       }
 
+      // 環境変数経由で接続した場合はlocalStorageにも保存（次回起動を高速化）
+      if (!localStorage.getItem(SHEET_ID_KEY) && sheetId) {
+        localStorage.setItem(SHEET_ID_KEY, sheetId)
+        setSpreadsheetId(sheetId)
+      }
       setData(() => {
         const merged = { ...remoteData, currentAdminId: member.id }
         saveCache(merged)
@@ -179,6 +185,28 @@ export function useStore() {
     try {
       const token = await getValidToken()
       const remoteData = await loadAllData(token, sheetId)
+      setData(prev => {
+        const merged = { ...remoteData, currentAdminId: prev.currentAdminId }
+        saveCache(merged)
+        return merged
+      })
+    } finally {
+      setIsLoadingSheets(false)
+    }
+  }, [])
+
+  // ─── スプレッドシート変更 ────────────────────────────────
+  const changeSheet = useCallback(async (newSheetId: string) => {
+    const trimmed = newSheetId.trim()
+    if (!trimmed) throw new Error('シートIDを入力してください')
+    setIsLoadingSheets(true)
+    try {
+      const token = await getValidToken()
+      const exists = await checkSpreadsheetExists(token, trimmed)
+      if (!exists) throw new Error('シートが見つかりません。IDを確認してください。')
+      const remoteData = await loadAllData(token, trimmed)
+      localStorage.setItem(SHEET_ID_KEY, trimmed)
+      setSpreadsheetId(trimmed)
       setData(prev => {
         const merged = { ...remoteData, currentAdminId: prev.currentAdminId }
         saveCache(merged)
@@ -409,7 +437,7 @@ export function useStore() {
 
   return {
     data, currentAdmin, syncStatus, spreadsheetId, isLoadingSheets,
-    loginWithGoogle, createNewSheet, connectExistingSheet, disconnectSheet, logout, refreshData,
+    loginWithGoogle, createNewSheet, connectExistingSheet, disconnectSheet, logout, refreshData, changeSheet,
     addMember, updateMember, updateMemberRole, deleteMember,
     createShiftMonth, publishShiftMonth, closeShiftMonth,
     addShiftSlot, updateShiftSlot, deleteShiftSlot, copyShiftSlots, confirmShiftSlot,

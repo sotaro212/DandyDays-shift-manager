@@ -1,6 +1,6 @@
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { CalendarDays, Users, LayoutDashboard, LogOut } from 'lucide-react'
+import { CalendarDays, Users, LayoutDashboard, LogOut, Database } from 'lucide-react'
 import { useStoreContext } from '@/store/StoreContext'
 
 const navItems = [
@@ -12,11 +12,26 @@ const navItems = [
 export function AdminLayout({ children }: { children: ReactNode }) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const { currentAdmin, logout } = useStoreContext()
+  const { currentAdmin, logout, changeSheet, spreadsheetId, isLoadingSheets } = useStoreContext()
+
+  const [showChangeSheet, setShowChangeSheet] = useState(false)
+  const [newSheetId, setNewSheetId] = useState('')
+  const [sheetError, setSheetError] = useState('')
 
   const handleLogout = () => {
     logout()
     navigate('/admin/login')
+  }
+
+  const handleChangeSheet = async () => {
+    setSheetError('')
+    try {
+      await changeSheet(newSheetId)
+      setShowChangeSheet(false)
+      setNewSheetId('')
+    } catch (e) {
+      setSheetError(e instanceof Error ? e.message : 'エラーが発生しました')
+    }
   }
 
   return (
@@ -26,12 +41,61 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         <span className="font-bold text-lg tracking-wide">シフト管理</span>
         <div className="flex items-center gap-3 text-sm">
           <span className="hidden sm:block">{currentAdmin?.name}</span>
+          <button
+            onClick={() => { setShowChangeSheet(true); setNewSheetId(spreadsheetId ?? '') }}
+            className="flex items-center gap-1 hover:text-dandy-100"
+            title="スプレッドシートを変更">
+            <Database size={15} />
+          </button>
           <button onClick={handleLogout} className="flex items-center gap-1 hover:text-dandy-100">
             <LogOut size={16} />
             <span className="hidden sm:block">ログアウト</span>
           </button>
         </div>
       </header>
+
+      {/* スプレッドシート変更モーダル */}
+      {showChangeSheet && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4">
+            <h2 className="font-bold text-gray-800 flex items-center gap-2">
+              <Database size={18} className="text-dandy-500" />
+              スプレッドシートを変更
+            </h2>
+            <p className="text-xs text-gray-500">
+              現在: <span className="font-mono text-gray-700 break-all">{spreadsheetId ?? '未設定'}</span>
+            </p>
+            <div>
+              <label className="block text-sm font-medium mb-1">新しいスプレッドシートID</label>
+              <input
+                type="text"
+                value={newSheetId}
+                onChange={e => setNewSheetId(e.target.value)}
+                placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"
+                className="w-full border rounded-lg px-3 py-2 text-sm font-mono"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                シートURLの /spreadsheets/d/<span className="font-bold">ここの部分</span>/edit
+              </p>
+            </div>
+            {sheetError && <p className="text-red-500 text-xs">{sheetError}</p>}
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setShowChangeSheet(false); setSheetError('') }}
+                className="flex-1 border py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                キャンセル
+              </button>
+              <button
+                onClick={handleChangeSheet}
+                disabled={isLoadingSheets || !newSheetId.trim()}
+                className="flex-1 bg-dandy-500 text-white py-2 rounded-lg text-sm hover:bg-dandy-600 disabled:opacity-50">
+                {isLoadingSheets ? '接続中...' : '変更する'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       <div className="flex flex-1">
         {/* サイドバー（デスクトップ） */}

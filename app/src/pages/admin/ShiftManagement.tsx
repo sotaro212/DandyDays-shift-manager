@@ -156,8 +156,16 @@ export function ShiftManagement() {
   }
 
   const openConfirm = (slot: ShiftSlot) => {
-    const responses = getSlotResponses(slot.id)
-    setSelectedMembers(responses.slice(0, slot.requiredCount).map(r => r.memberId))
+    if (slot.status === 'confirmed') {
+      // 確定済み：現在のアサインメンバーを初期選択
+      const assigned = data.staffResponses
+        .filter(r => r.shiftSlotId === slot.id && r.isAssigned)
+        .map(r => r.memberId)
+      setSelectedMembers(assigned)
+    } else {
+      const responses = getSlotResponses(slot.id)
+      setSelectedMembers(responses.slice(0, slot.requiredCount).map(r => r.memberId))
+    }
     setShowConfirm(slot)
   }
 
@@ -488,7 +496,7 @@ export function ShiftManagement() {
                                 <button
                                   onClick={() => { setManualAddSlotId(slot.id); setManualAddMemberId('') }}
                                   className="mt-2 text-xs text-dandy-500 hover:text-dandy-600 flex items-center gap-1">
-                                  <Plus size={12} /> 口頭回答を手動追加
+                                  <Plus size={12} /> メンバーを追加
                                 </button>
                               )}
                             </div>

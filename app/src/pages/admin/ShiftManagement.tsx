@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { format, getDaysInMonth, parseISO } from 'date-fns'
 import { ja } from 'date-fns/locale'
-import { Plus, Trash2, Copy, Share2, Lock, ChevronDown, ChevronUp, UserCheck, CheckCircle2, AlertCircle, Pencil, X } from 'lucide-react'
+import { Plus, Trash2, Copy, Share2, Lock, ChevronDown, ChevronUp, UserCheck, CheckCircle2, AlertCircle, Pencil, X, RefreshCw, MessageSquare } from 'lucide-react'
 import { useStoreContext } from '@/store/StoreContext'
 import { getGasUrl, saveGasUrl } from '@/services/gasService'
 import { Modal } from '@/components/Modal'
@@ -14,7 +14,7 @@ type Tab = 'slots' | 'responses' | 'confirmed' | 'calendar'
 export function ShiftManagement() {
   const { data, createShiftMonth, addShiftSlot, updateShiftSlot, deleteShiftSlot,
           publishShiftMonth, closeShiftMonth, copyShiftSlots, confirmShiftSlot,
-          getSlotResponses, deleteStaffResponse } = useStoreContext()
+          getSlotResponses, deleteStaffResponse, refreshData, isLoadingSheets } = useStoreContext()
 
   const now = new Date()
   const [selYear, setSelYear] = useState(now.getFullYear())
@@ -41,6 +41,35 @@ export function ShiftManagement() {
 
   // カレンダー詳細ポップアップ（④）
   const [calendarPopupSlot, setCalendarPopupSlot] = useState<ShiftSlot | null>(null)
+
+  // LINE共有テキスト
+  const [lineCopied, setLineCopied] = useState(false)
+
+  const generateLineText = () => {
+    const lines: string[] = [`📅 ${selYear}年${selMonth}月 確定シフト\n`]
+    Array.from(slotsByDate.entries()).forEach(([date, daySlots]) => {
+      const confirmed = daySlots.filter(s => s.status === 'confirmed')
+      if (confirmed.length === 0) return
+      const d = parseISO(date)
+      const dateLabel = format(d, 'M/d', { locale: ja })
+      const dow = DOW[d.getDay()]
+      confirmed.forEach(slot => {
+        const assigned = data.staffResponses
+          .filter(r => r.shiftSlotId === slot.id && r.isAssigned)
+          .map(r => data.members.find(m => m.id === r.memberId)?.name)
+          .filter(Boolean)
+        lines.push(`${dateLabel}(${dow}) ${slot.locationName}`)
+        lines.push(assigned.length > 0 ? `　${assigned.join('、')}` : '　（未割当）')
+      })
+    })
+    return lines.join('\n')
+  }
+
+  const handleCopyLineText = () => {
+    navigator.clipboard.writeText(generateLineText())
+    setLineCopied(true)
+    setTimeout(() => setLineCopied(false), 2000)
+  }
 
   // 編集モーダル（①）
   const [editingSlot, setEditingSlot] = useState<ShiftSlot | null>(null)
@@ -157,6 +186,14 @@ export function ShiftManagement() {
       {/* ヘッダー：月選択 */}
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="text-xl font-bold text-gray-800 flex-1">シフト管理</h1>
+        <button
+          onClick={refreshData}
+          disabled={isLoadingSheets}
+          title="スプレッドシートから最新データを読み込む"
+          className="flex items-center gap-1.5 border text-sm px-3 py-1.5 rounded-lg hover:bg-gray-50 disabled:opacity-50 text-gray-600">
+          <RefreshCw size={14} className={isLoadingSheets ? 'animate-spin' : ''} />
+          更新
+        </button>
         <select className="border rounded-lg px-2 py-1.5 text-sm" value={selYear}
           onChange={e => setSelYear(Number(e.target.value))}>
           {[now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1].map(y => (
@@ -432,6 +469,16 @@ export function ShiftManagement() {
           </div>
         ) : (
           <div className="space-y-2">
+            {/* LINE共有ボタン */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-3">
+              <MessageSquare size={16} className="text-green-600 shrink-0" />
+              <p className="text-xs text-green-800 flex-1">確定シフトをLINEで共有できるテキストを生成します</p>
+              <button
+                onClick={handleCopyLineText}
+                className="text-xs font-bold bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shrink-0 transition-colors">
+                {lineCopied ? '✓ コピー済み' : 'テキストをコピー'}
+              </button>
+            </div>
             {Array.from(slotsByDate.entries()).map(([date, daySlots]) => {
               const confirmed = daySlots.filter(s => s.status === 'confirmed')
               if (confirmed.length === 0) return null

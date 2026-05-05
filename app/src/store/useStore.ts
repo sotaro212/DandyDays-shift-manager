@@ -166,6 +166,24 @@ export function useStore() {
     }
   }, [])
 
+  // ─── データ更新（スプレッドシートから再読込）────────────
+  const refreshData = useCallback(async () => {
+    const sheetId = localStorage.getItem(SHEET_ID_KEY)
+    if (!sheetId) return
+    setIsLoadingSheets(true)
+    try {
+      const token = await getValidToken()
+      const remoteData = await loadAllData(token, sheetId)
+      setData(prev => {
+        const merged = { ...remoteData, currentAdminId: prev.currentAdminId }
+        saveCache(merged)
+        return merged
+      })
+    } finally {
+      setIsLoadingSheets(false)
+    }
+  }, [])
+
   const logout = useCallback(() => {
     clearToken()
     sessionStorage.removeItem(ADMIN_SESSION_KEY)
@@ -386,7 +404,7 @@ export function useStore() {
 
   return {
     data, currentAdmin, syncStatus, spreadsheetId, isLoadingSheets,
-    loginWithGoogle, createNewSheet, connectExistingSheet, disconnectSheet, logout,
+    loginWithGoogle, createNewSheet, connectExistingSheet, disconnectSheet, logout, refreshData,
     addMember, updateMember, updateMemberRole, deleteMember,
     createShiftMonth, publishShiftMonth, closeShiftMonth,
     addShiftSlot, updateShiftSlot, deleteShiftSlot, copyShiftSlots, confirmShiftSlot,

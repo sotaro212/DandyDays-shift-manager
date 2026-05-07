@@ -59,6 +59,9 @@ export function StaffResponse() {
   const [regLoading, setRegLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
+  // マウント時にトップへスクロール（アプリ内ブラウザのリンク遷移対策）
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   // ローカルデータがあればそちらを使う（管理者デバイス）
   const localShiftMonth = data.shiftMonths.find(m => m.id === monthId)
   const isAdminMode = !!localShiftMonth
@@ -325,9 +328,6 @@ export function StaffResponse() {
   }
 
   // ─── メイン画面 ───────────────────────────────
-  // アプリ内ブラウザからのリンク遷移でスクロール位置がずれる場合の対処
-  useEffect(() => { window.scrollTo(0, 0) }, [])
-
   const slotsByDate = slots.reduce((acc, slot) => {
     if (!acc[slot.date]) acc[slot.date] = []
     acc[slot.date].push(slot)

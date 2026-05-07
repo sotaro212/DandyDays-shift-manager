@@ -338,8 +338,10 @@ export function StaffResponse() {
   const displayName = isAdminMode ? member?.name : localStorage.getItem('staff_name') ?? ''
 
   return (
-    <div className="min-h-screen bg-dandy-50 overflow-x-hidden" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-      <header className="bg-dandy-600 text-white px-4 py-3">
+    <div className="bg-dandy-50" style={{ minHeight: '100dvh' }}>
+      {/* ヘッダー：sticky で常に上部に固定 */}
+      <header className="sticky top-0 z-10 bg-dandy-600 text-white px-4 py-3"
+        style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top))' }}>
         <h1 className="font-bold">{shiftMonth.year}年{shiftMonth.month}月 シフト希望</h1>
         <p className="text-sm text-dandy-200">こんにちは、{displayName}さん</p>
         {shiftMonth.deadlineAt && (
@@ -349,10 +351,11 @@ export function StaffResponse() {
         )}
       </header>
 
-      <div className="max-w-lg mx-auto p-4 space-y-4 pb-28">
+      {/* コンテンツ：ボトムバー分の余白を確保 */}
+      <div className="w-full max-w-lg mx-auto px-4 pt-4 pb-32 space-y-4">
         <p className="text-sm text-gray-600">参加できる日付・場所をタップして選択してください</p>
         {selectedCount > 0 && (
-          <p className="text-xs text-dandy-500 bg-dandy-50 rounded-lg px-3 py-2">
+          <p className="text-xs text-dandy-500 bg-white border border-dandy-100 rounded-lg px-3 py-2">
             前回の回答が読み込まれています。変更がある場合はタップしてください。
           </p>
         )}
@@ -360,7 +363,7 @@ export function StaffResponse() {
         {Object.entries(slotsByDate).map(([date, daySlots]) => {
           const d = parseISO(date)
           return (
-            <div key={date} className="bg-white rounded-xl border overflow-hidden">
+            <div key={date} className="bg-white rounded-xl border overflow-hidden shadow-sm">
               <div className="bg-gray-50 px-4 py-2 border-b">
                 <span className="font-medium text-sm text-gray-700">
                   {format(d, 'M月d日', { locale: ja })}
@@ -375,20 +378,20 @@ export function StaffResponse() {
                   const isSelected = resp?.isAvailable === true
                   return (
                     <button key={slot.id} onClick={() => handleToggle(slot.id)}
-                      className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors
-                        ${isSelected ? 'bg-dandy-50' : 'hover:bg-gray-50'}`}>
-                      <div>
-                        <p className={`font-medium text-sm ${isSelected ? 'text-dandy-600' : 'text-gray-800'}`}>
+                      className={`w-full flex items-center justify-between px-4 py-4 text-left transition-colors
+                        ${isSelected ? 'bg-dandy-50' : 'active:bg-gray-100'}`}>
+                      <div className="flex-1 min-w-0 pr-3">
+                        <p className={`font-medium text-sm leading-snug ${isSelected ? 'text-dandy-600' : 'text-gray-800'}`}>
                           {slot.locationName}
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-gray-400 mt-0.5">
                           必要: {slot.requiredCount}名
                           {slot.note && <> ・ {slot.note}</>}
                         </p>
                       </div>
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0
-                        ${isSelected ? 'border-dandy-500 bg-dandy-500' : 'border-gray-300'}`}>
-                        {isSelected && <CheckCircle2 size={14} className="text-white" />}
+                      <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0
+                        ${isSelected ? 'border-dandy-500 bg-dandy-500' : 'border-gray-300 bg-white'}`}>
+                        {isSelected && <CheckCircle2 size={15} className="text-white" />}
                       </div>
                     </button>
                   )
@@ -399,11 +402,13 @@ export function StaffResponse() {
         })}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
-        <div className="max-w-lg mx-auto flex items-center gap-3">
-          <span className="text-sm text-gray-600">{selectedCount}枠選択中</span>
+      {/* ボトムバー：iOS ホームバー対応 */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg"
+        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+        <div className="w-full max-w-lg mx-auto flex items-center gap-3 px-4 pt-3 pb-1">
+          <span className="text-sm text-gray-500 shrink-0">{selectedCount}枠選択</span>
           <button onClick={handleSubmit}
-            className="flex-1 bg-dandy-500 hover:bg-dandy-600 text-white font-medium py-3 rounded-xl text-sm transition-colors">
+            className="flex-1 bg-dandy-500 active:bg-dandy-600 text-white font-bold py-3.5 rounded-xl text-sm transition-colors">
             {submitted ? '✓ 回答を保存しました' : '回答を確定する'}
           </button>
         </div>

@@ -3,6 +3,17 @@ import { useNavigate } from 'react-router-dom'
 import { useStoreContext } from '@/store/StoreContext'
 import { SetupSheet } from '@/components/SetupSheet'
 
+function detectInAppBrowser(): boolean {
+  const ua = navigator.userAgent
+  // LINE, Facebook, Instagram, Twitter, WeChat, その他WebView
+  if (/FBAN|FBAV|Instagram|Line\/|Twitter|MicroMessenger/.test(ua)) return true
+  // iOS でSafari/Chrome/Firefox以外（WebView）
+  if (/iPhone|iPad|iPod/.test(ua) && !/Safari/.test(ua) && !/CriOS/.test(ua) && !/FxiOS/.test(ua)) return true
+  // Android WebView
+  if (/Android/.test(ua) && /wv/.test(ua)) return true
+  return false
+}
+
 export function Login() {
   const { loginWithGoogle, createNewSheet, connectExistingSheet, isLoadingSheets } = useStoreContext()
   const navigate = useNavigate()
@@ -67,6 +78,28 @@ export function Login() {
               <code className="bg-amber-100 px-1 rounded">.env.local</code> に
               <code className="bg-amber-100 px-1 rounded ml-1">VITE_GOOGLE_CLIENT_ID</code> を設定してください。
             </p>
+          </div>
+        ) : detectInAppBrowser() ? (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
+            <p className="font-medium text-amber-800 text-sm">⚠️ アプリ内ブラウザでは開けません</p>
+            <p className="text-xs text-amber-700">
+              LINEやInstagramなどのアプリ内ブラウザでは、GoogleログインがGoogleのポリシーによりブロックされます。
+            </p>
+            <p className="text-xs text-amber-700 font-medium">
+              Safari または Chrome でこのページを開いてください。
+            </p>
+            <button
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({ url: window.location.href })
+                } else {
+                  navigator.clipboard.writeText(window.location.href)
+                  alert('URLをコピーしました。Safariに貼り付けて開いてください。')
+                }
+              }}
+              className="w-full bg-amber-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-amber-700">
+              URLをコピー / 共有
+            </button>
           </div>
         ) : (
           <>

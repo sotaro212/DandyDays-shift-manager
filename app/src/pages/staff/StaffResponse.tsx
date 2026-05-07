@@ -325,6 +325,9 @@ export function StaffResponse() {
   }
 
   // ─── メイン画面 ───────────────────────────────
+  // アプリ内ブラウザからのリンク遷移でスクロール位置がずれる場合の対処
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   const slotsByDate = slots.reduce((acc, slot) => {
     if (!acc[slot.date]) acc[slot.date] = []
     acc[slot.date].push(slot)
@@ -335,7 +338,7 @@ export function StaffResponse() {
   const displayName = isAdminMode ? member?.name : localStorage.getItem('staff_name') ?? ''
 
   return (
-    <div className="min-h-screen bg-dandy-50 overflow-x-hidden">
+    <div className="min-h-screen bg-dandy-50 overflow-x-hidden" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       <header className="bg-dandy-600 text-white px-4 py-3">
         <h1 className="font-bold">{shiftMonth.year}年{shiftMonth.month}月 シフト希望</h1>
         <p className="text-sm text-dandy-200">こんにちは、{displayName}さん</p>
@@ -396,7 +399,7 @@ export function StaffResponse() {
         })}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
         <div className="max-w-lg mx-auto flex items-center gap-3">
           <span className="text-sm text-gray-600">{selectedCount}枠選択中</span>
           <button onClick={handleSubmit}

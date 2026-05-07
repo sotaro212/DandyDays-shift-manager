@@ -590,7 +590,7 @@ export function ShiftManagement() {
             <h2 className="font-semibold text-gray-700">{selYear}年{selMonth}月 シフトカレンダー</h2>
             <button
               onClick={() => window.print()}
-              className="text-xs border px-3 py-1 rounded-lg hover:bg-gray-100 text-gray-600">
+              className="text-xs border px-4 py-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 text-gray-600 min-h-[40px]">
               印刷・保存
             </button>
           </div>

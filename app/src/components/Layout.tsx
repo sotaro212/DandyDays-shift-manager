@@ -37,7 +37,9 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* ヘッダー */}
-      <header className="bg-dandy-500 text-white px-4 py-3 flex items-center justify-between shadow">
+      <header className="bg-dandy-500 text-white shadow">
+        <div style={{ height: 'env(safe-area-inset-top)' }} />
+        <div className="px-4 py-3 flex items-center justify-between">
         <span className="font-bold text-lg tracking-wide">シフト管理</span>
         <div className="flex items-center gap-3 text-sm">
           <span className="hidden sm:block">{currentAdmin?.name}</span>
@@ -51,6 +53,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             <LogOut size={16} />
             <span className="hidden sm:block">ログアウト</span>
           </button>
+        </div>
         </div>
       </header>
 
@@ -118,18 +121,21 @@ export function AdminLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* ボトムナビ（モバイル） */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex">
-        {navItems.map(({ to, label, icon: Icon }) => (
-          <Link
-            key={to}
-            to={to}
-            className={`flex-1 flex flex-col items-center py-2 text-xs
-              ${pathname.startsWith(to) ? 'text-dandy-500' : 'text-gray-500'}`}
-          >
-            <Icon size={20} />
-            {label}
-          </Link>
-        ))}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="flex">
+          {navItems.map(({ to, label, icon: Icon }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`flex-1 flex flex-col items-center py-2 text-xs
+                ${pathname.startsWith(to) ? 'text-dandy-500' : 'text-gray-500'}`}
+            >
+              <Icon size={20} />
+              {label}
+            </Link>
+          ))}
+        </div>
       </nav>
     </div>
   )

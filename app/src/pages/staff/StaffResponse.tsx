@@ -338,7 +338,7 @@ export function StaffResponse() {
   const displayName = isAdminMode ? member?.name : localStorage.getItem('staff_name') ?? ''
 
   return (
-    <div className="bg-dandy-50" style={{ minHeight: '100dvh' }}>
+    <div className="bg-dandy-50" style={{ height: '100dvh', overflowY: 'auto' }}>
       {/* iOS ノッチ/Dynamic Island 対応のセーフエリア（ヘッダー色で塗る） */}
       <div className="sticky top-0 z-10 bg-dandy-600">
         <div style={{ height: 'env(safe-area-inset-top)' }} />

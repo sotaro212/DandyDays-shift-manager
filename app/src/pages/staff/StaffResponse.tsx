@@ -339,9 +339,10 @@ export function StaffResponse() {
 
   return (
     <div className="bg-dandy-50" style={{ minHeight: '100dvh' }}>
-      {/* ヘッダー：sticky で常に上部に固定 */}
-      <header className="sticky top-0 z-10 bg-dandy-600 text-white px-4 py-3"
-        style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top))' }}>
+      {/* iOS ノッチ/Dynamic Island 対応のセーフエリア（ヘッダー色で塗る） */}
+      <div className="sticky top-0 z-10 bg-dandy-600">
+        <div style={{ height: 'env(safe-area-inset-top)' }} />
+        <header className="text-white px-4 py-3">
         <h1 className="font-bold">{shiftMonth.year}年{shiftMonth.month}月 シフト希望</h1>
         <p className="text-sm text-dandy-200">こんにちは、{displayName}さん</p>
         {shiftMonth.deadlineAt && (
@@ -350,6 +351,7 @@ export function StaffResponse() {
           </p>
         )}
       </header>
+      </div>
 
       {/* コンテンツ：ボトムバー分の余白を確保 */}
       <div className="w-full max-w-lg mx-auto px-4 pt-4 pb-32 space-y-4">

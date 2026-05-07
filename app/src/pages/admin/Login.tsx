@@ -5,12 +5,17 @@ import { SetupSheet } from '@/components/SetupSheet'
 
 function detectInAppBrowser(): boolean {
   const ua = navigator.userAgent
-  // LINE, Facebook, Instagram, Twitter, WeChat, その他WebView
-  if (/FBAN|FBAV|Instagram|Line\/|Twitter|MicroMessenger/.test(ua)) return true
-  // iOS でSafari/Chrome/Firefox以外（WebView）
-  if (/iPhone|iPad|iPod/.test(ua) && !/Safari/.test(ua) && !/CriOS/.test(ua) && !/FxiOS/.test(ua)) return true
-  // Android WebView
-  if (/Android/.test(ua) && /wv/.test(ua)) return true
+  // LINE（iOS/Android）: UA に "Line/" が含まれる。Safari/ も含むため先に確認
+  if (/Line\//.test(ua)) return true
+  // Facebook, Instagram, Twitter/X, TikTok, Snapchat, WeChat, Yahoo Japan
+  if (/FBAN|FBAV|FBIOS|Instagram|Twitter|TikTok|Snapchat|MicroMessenger|YahooJapan/.test(ua)) return true
+  // Android WebView（Chrome系に "wv" が付く）
+  if (/Android/.test(ua) && /wv\b/.test(ua)) return true
+  // 汎用 WebView
+  if (/WebView/.test(ua)) return true
+  // iOS で Safari でも Chrome(CriOS) でも Firefox(FxiOS) でも Edge(EdgiOS) でもない
+  if (/iPhone|iPad|iPod/.test(ua) &&
+      !/Safari\//.test(ua) && !/CriOS\//.test(ua) && !/FxiOS\//.test(ua) && !/EdgiOS\//.test(ua)) return true
   return false
 }
 

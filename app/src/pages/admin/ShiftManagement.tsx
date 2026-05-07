@@ -589,7 +589,13 @@ export function ShiftManagement() {
           <div className="bg-gray-50 px-4 py-3 border-b flex items-center justify-between">
             <h2 className="font-semibold text-gray-700">{selYear}年{selMonth}月 シフトカレンダー</h2>
             <button
-              onClick={() => window.print()}
+              onClick={() => {
+                if (window.innerWidth < 640) {
+                  alert('スクリーンショットで保存してください\n\niOS: サイドボタン＋音量ボタン\nAndroid: 電源ボタン＋音量ダウン')
+                } else {
+                  window.print()
+                }
+              }}
               className="text-xs border px-4 py-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 text-gray-600 min-h-[40px]">
               印刷・保存
             </button>

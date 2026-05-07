@@ -241,18 +241,22 @@ export function useStore() {
     return newMember
   }, [update, syncToSheets])
 
-  const updateMemberRole = useCallback((memberId: string, role: 'user' | 'admin', operatorId: string) => {
+  const updateMemberRole = useCallback(async (memberId: string, role: 'user' | 'admin', operatorId: string) => {
     if (memberId === operatorId) throw new Error('自身の権限は変更できません')
     const admins = data.members.filter(m => m.role === 'admin')
     const target = data.members.find(m => m.id === memberId)
     if (target?.role === 'admin' && admins.length === 1) throw new Error('管理者が1名のため降格できません')
+    const updated = { ...target!, role }
+    const sheetId = localStorage.getItem(SHEET_ID_KEY)
+    if (sheetId && CLIENT_ID) {
+      const token = await getValidToken()
+      await updateRowById(token, sheetId, 'members', updated as unknown as Record<string, unknown>)
+    }
     update(prev => ({
       ...prev,
       members: prev.members.map(m => m.id === memberId ? { ...m, role } : m),
     }))
-    const updated = { ...target!, role }
-    syncToSheets((token, id) => updateRowById(token, id, 'members', updated as unknown as Record<string, unknown>))
-  }, [data.members, update, syncToSheets])
+  }, [data.members, update])
 
   const updateMember = useCallback((memberId: string, patch: { name?: string; city?: string; email?: string }) => {
     let updated: Member | undefined

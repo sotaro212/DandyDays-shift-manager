@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
-import { UserPlus, Trash2, ShieldCheck, ShieldOff, Pencil } from 'lucide-react'
+import { UserPlus, Trash2, ShieldCheck, ShieldOff, Pencil, Loader2 } from 'lucide-react'
 import { useStoreContext } from '@/store/StoreContext'
 import { Modal } from '@/components/Modal'
 import { Badge } from '@/components/Badge'
@@ -15,6 +15,7 @@ export function StaffManagement() {
   const [city, setCity] = useState('')
   const [error, setError] = useState('')
   const [filter, setFilter] = useState<'all' | 'admin' | 'user'>('all')
+  const [roleChangingId, setRoleChangingId] = useState<string | null>(null)
 
   // 編集モーダル用
   const [editingMember, setEditingMember] = useState<Member | null>(null)
@@ -32,13 +33,18 @@ export function StaffManagement() {
     setName(''); setEmail(''); setCity(''); setError(''); setShowAdd(false)
   }
 
-  const handleRoleToggle = (memberId: string, currentRole: 'user' | 'admin') => {
+  const handleRoleToggle = async (memberId: string, currentRole: 'user' | 'admin', memberName: string) => {
     if (!currentAdmin) return
     const newRole = currentRole === 'admin' ? 'user' : 'admin'
+    const label = newRole === 'admin' ? '管理者に昇格' : '管理者を降格'
+    if (!confirm(`${memberName} を${label}しますか？\n（スプレッドシートに即時反映されます）`)) return
+    setRoleChangingId(memberId)
     try {
-      updateMemberRole(memberId, newRole, currentAdmin.id)
+      await updateMemberRole(memberId, newRole, currentAdmin.id)
     } catch (e) {
-      alert(String(e))
+      alert(`権限変更に失敗しました: ${String(e)}\nスプレッドシートへの接続を確認してください。`)
+    } finally {
+      setRoleChangingId(null)
     }
   }
 
@@ -133,11 +139,14 @@ export function StaffManagement() {
                 </button>
                 {member.id !== currentAdmin?.id && (
                   <button
-                    onClick={() => handleRoleToggle(member.id, member.role)}
+                    onClick={() => handleRoleToggle(member.id, member.role, member.name)}
+                    disabled={roleChangingId === member.id}
                     title={member.role === 'admin' ? '管理者を降格' : '管理者に昇格'}
-                    className="text-gray-400 hover:text-dandy-400 p-1"
+                    className="text-gray-400 hover:text-dandy-400 p-1 disabled:opacity-50"
                   >
-                    {member.role === 'admin' ? <ShieldOff size={16} /> : <ShieldCheck size={16} />}
+                    {roleChangingId === member.id
+                      ? <Loader2 size={16} className="animate-spin" />
+                      : member.role === 'admin' ? <ShieldOff size={16} /> : <ShieldCheck size={16} />}
                   </button>
                 )}
                 <button

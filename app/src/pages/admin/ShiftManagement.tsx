@@ -85,6 +85,14 @@ export function ShiftManagement() {
 
   useEffect(() => { if (gasUrl) saveGasUrl(gasUrl) }, [gasUrl])
 
+  // シフト希望タブを開いたとき、未知のメンバーがいれば自動更新
+  useEffect(() => {
+    if (activeTab !== 'responses') return
+    const allResponses = data.staffResponses
+    const hasUnknown = allResponses.some(r => !data.members.find(m => m.id === r.memberId))
+    if (hasUnknown) refreshData()
+  }, [activeTab]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const currentMonth = data.shiftMonths.find(m => m.year === selYear && m.month === selMonth)
   const slots = useMemo(
     () => data.shiftSlots
@@ -445,7 +453,8 @@ export function ShiftManagement() {
                                       <div key={r.id} className="flex items-center gap-1 group">
                                         <p className="text-sm text-gray-600 flex-1">
                                           <span className="text-xs text-gray-400 mr-1">{i + 1}.</span>
-                                          シフト希望: <span className="font-medium">{m?.name ?? '?'}</span>
+                                          シフト希望: <span className="font-medium">{m?.name ?? '読込中...'}</span>
+                                          {!m && <span className="ml-1 text-xs text-amber-500">（更新ボタンを押してください）</span>}
                                           {m?.role === 'admin' && <span className="ml-1 text-xs text-dandy-500">（管理者）</span>}
                                           {m?.city && <span className="ml-1 text-xs text-gray-400">{m.city}</span>}
                                         </p>
